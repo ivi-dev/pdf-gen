@@ -8,24 +8,48 @@ import com.pdfgen.reporting.Reporter;
 
 class Proc {
 
-    private Proc() { }
+    private final Streams streams;
 
-    static void run(
+    Proc() { 
+        this(new DefaultStreams());
+    }
+
+    Proc(Streams streams) { 
+        this.streams = streams;
+    }
+
+     void run(
         String[] args, 
         ArgParser<Args> argParser, 
-        Function<Args, PDFGenerator> pdfGeneratorFactory, 
+        Function<Args, PDFGenerator> pdfGeneratorProvider, 
         Reporter reporter
     ) {
+        StandardStreams std = null;
         try {
+            std = streams.muteStandardOuts();
             var parsedArgs = argParser.parse(args);
-            pdfGeneratorFactory.apply(parsedArgs).generate();
+            pdfGeneratorProvider.apply(parsedArgs).generate();
+            streams.unmuteStandardOuts(std);
             reporter.reportSuccess("PDF generated successfully!");
-        } catch (ParameterException e) {
+        } catch (Exception e) {
+            handleException(e, reporter, argParser, streams, std);
+        }
+    }
+
+    private static void handleException(
+        Exception e, 
+        Reporter reporter, 
+        ArgParser<Args> argParser,
+        Streams streams, 
+        StandardStreams std
+    ) {
+        streams.unmuteStandardOuts(std);
+        if (e instanceof ParameterException) {
             reporter.reportError(e.getMessage());
             argParser.printUsage();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            return;
+        } 
+        e.printStackTrace();
     }
 
 }
