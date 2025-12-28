@@ -1,5 +1,6 @@
 package com.pdfgen;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -12,7 +13,7 @@ import com.pdfgen.cli.DefaultArgParser;
 import com.pdfgen.reporting.StandardOutReporter;
 
 class ProcTest {
-
+    
     private DefaultArgParser<Args> argParser;
 
     private PDFGenerator energyReport;
@@ -28,8 +29,18 @@ class ProcTest {
     }
 
     @Test
+    void parameterlessConstructorInitializesObject() {
+        assertNotNull(new Proc());
+    }
+
+    @Test
     void runCompletesWithSuccessMessage() {
-        Proc.run(new String[] { }, argParser, (parsedArgs) -> energyReport, reporter);
+        new Proc().run(
+            new String[] { }, 
+            argParser, 
+            (parsedArgs) -> energyReport, 
+            reporter
+        );
         verify(reporter).reportSuccess("PDF generated successfully!");
     }
 
@@ -39,7 +50,12 @@ class ProcTest {
         doThrow(new ParameterException(excMsg))
             .when(argParser)
             .parse(new String[] { "wrong-arg" });
-        Proc.run(new String[] { "wrong-arg" }, argParser, (parsedArgs) -> energyReport, reporter);
+        new Proc().run(
+            new String[] { "wrong-arg" }, 
+            argParser, 
+            (parsedArgs) -> energyReport, 
+            reporter
+        );
         verify(reporter).reportError(excMsg);
         verify(argParser).printUsage();
     }
@@ -48,7 +64,12 @@ class ProcTest {
     void runHandlesGenericException() throws Exception {
         var exception = mock(Exception.class);
         doThrow(exception).when(energyReport).generate();
-        Proc.run(new String[] { }, argParser, (parsedArgs) -> energyReport, reporter);
+        new Proc().run(
+            new String[] { }, 
+            argParser, 
+            (parsedArgs) -> energyReport, 
+            reporter
+        );
         verify(exception).printStackTrace();
     }
 

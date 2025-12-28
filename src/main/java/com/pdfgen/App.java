@@ -8,7 +8,7 @@ public class App {
     private App() { }
 
     public static void main(String[] args) {
-        Proc.run(
+        new Proc().run(
             args, 
             new DefaultArgParser<>(new Args()), 
             (parsedArgs) -> 
