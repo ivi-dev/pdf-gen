@@ -58,9 +58,13 @@ A command‑line tool that generates PDF documents from user‑provided HTML tem
 Then open ```/target/site/jacoco/index.html``` in a browser to see the code coverage report.
 
 # Dependencies
-- [jsoup](https://github.com/jhy/jsoup) (HTML parsing)
-- [openhtmltopdf](https://github.com/danfickle/openhtmltopdf) (PDF generation)
-- [jackson](https://github.com/FasterXML/jackson) (dynamic data parsing)
+- [JSoup](https://github.com/jhy/jsoup) (HTML parsing)
+- [Jackson](https://github.com/FasterXML/jackson) (dynamic data parsing)
+- [Flying Saucer](https://github.com/flyingsaucerproject/flyingsaucer) (HTML and CSS 2.1 rendering)
+- [OpenHTMLToPDF](https://github.com/danfickle/openhtmltopdf) (PDF generation)
+- [JCommander](https://github.com/cbeust/jcommander) (command-line arguments parsing)
+- [JUnit 5](https://github.com/junit-team/junit-framework) (testing framework)
+- [Mockito](https://github.com/mockito/mockito) (mocking framework)
 
 # License
 MIT
