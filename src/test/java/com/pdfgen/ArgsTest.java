@@ -32,8 +32,12 @@ public class ArgsTest {
             "document.pdf", 
             new Locale("bg"),
             List.of(
-                new FontDeclaration("Font-1", "/path/to/font-1.ttf")
-            )
+                new FontDeclaration(
+                    "Font-1", 
+                    "/path/to/font-1.ttf"
+                )
+            ),
+            true
         );
     } 
 
@@ -68,6 +72,11 @@ public class ArgsTest {
         assertEquals(1, fonts.size());
         assertEquals("Font-1", fonts.get(0).name());
         assertEquals("/path/to/font-1.ttf", fonts.get(0).path());
+    }
+
+    @Test
+    void getVerboseReturnsCorrectValue() {
+        assertEquals(true, parsedArgs.getVerbose());
     }
 
 }

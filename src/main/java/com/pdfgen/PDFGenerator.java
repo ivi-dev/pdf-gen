@@ -121,7 +121,8 @@ class PDFGenerator {
         docBuilder.resetFont();
     }
 
-    public void generate() throws Exception {
+    public void generate(boolean verbose) throws Exception {
+        // TODO: Handle "verbose" operation...
         try {
             try (var template = streams.newInputStream(Path.of(templatePath))) {
                 var w3cDoc = docBuilder.makeW3CDoc(template);

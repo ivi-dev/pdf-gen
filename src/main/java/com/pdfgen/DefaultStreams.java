@@ -39,18 +39,15 @@ class DefaultStreams implements Streams {
     }
 
     @Override
-    public StandardStreams muteStandardOuts() {
+    public PrintStream muteStandardOut() {
         PrintStream out = System.out; 
-        PrintStream err = System.err; 
         System.setOut(new PrintStream(OutputStream.nullOutputStream())); 
-        System.setErr(new PrintStream(OutputStream.nullOutputStream()));
-        return new StandardStreams(out, err);
+        return out;
     }
 
     @Override
-    public void unmuteStandardOuts(StandardStreams std) {
-        System.setOut(std.out()); 
-        System.setErr(std.err());
+    public void unmuteStandardOut(PrintStream out) {
+        System.setOut(out); 
     }
 
 }

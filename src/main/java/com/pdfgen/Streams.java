@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 
 interface Streams {
@@ -19,8 +20,8 @@ interface Streams {
 
     String getExternalUrl(String path);
 
-    StandardStreams muteStandardOuts();
+    PrintStream muteStandardOut();
 
-    void unmuteStandardOuts(StandardStreams std);
+    void unmuteStandardOut(PrintStream std);
     
 }
