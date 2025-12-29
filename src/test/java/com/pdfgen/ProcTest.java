@@ -10,8 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.PrintStream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,10 +29,6 @@ class ProcTest {
     private PDFGenerator pdfGenerator;
     
     private StandardReporter reporter;
-    
-    private Streams streams;
-
-    private PrintStream mockOrigOut;
     
     private Proc proc;
 
@@ -60,15 +54,11 @@ class ProcTest {
         when(argParser.parse(args)).thenReturn(parsedArgs);
         pdfGenerator = mock(PDFGenerator.class);
         reporter = mock(StandardReporter.class);
-        streams = mock(Streams.class);
-        mockOrigOut = mock(PrintStream.class);
-        when(streams.muteStandardOut()).thenReturn(mockOrigOut);
         proc = new Proc(
             args, 
             argParser, 
             (parsedArgs) -> pdfGenerator, 
-            reporter,
-            streams
+            reporter
         );
     }
 
@@ -90,17 +80,13 @@ class ProcTest {
         runProc(true, () -> {
             var inOrder = inOrder(reporter);
             inOrder.verify(reporter).info(
-                "Muting standard output temporarily to prevent " +
-                "external-library-generated logging \"noise\"."
-            );
-            inOrder.verify(reporter).info(
                 "Parsed command-line argments: arg1=val1 arg2=val2."
             );
             inOrder.verify(reporter).info(
                 "Starting PDF document generation."
             );
-            inOrder.verify(reporter).info(
-                "Unmuting standard output. It can now be written to again."
+            inOrder.verify(reporter).success(
+                "PDF generated successfully!"
             );
         });
     }
@@ -111,8 +97,7 @@ class ProcTest {
         var paramEx = new ParameterException(excMsg);
         when(argParser.parse(args)).thenThrow(paramEx);
         runProc(false, () -> {
-            var inOrder = inOrder(streams, reporter, argParser);
-            inOrder.verify(streams, times(0)).unmuteStandardOut(mockOrigOut);
+            var inOrder = inOrder(reporter, argParser);
             inOrder.verify(reporter).error(excMsg);
             inOrder.verify(argParser).printUsage();
         });
@@ -122,7 +107,6 @@ class ProcTest {
     void runHandlesGeneralExceptionSilently() throws Exception {
         var exc = makePdfGeneratorThrow(Exception.class);
         runProc(false, () -> {
-            verify(streams).unmuteStandardOut(mockOrigOut);
             verify(reporter).error(
                 String.format(
                     "ERROR: Could not generate PDF. Reason: %s.", 
@@ -179,17 +163,10 @@ class ProcTest {
         runProc(true, () -> {
             var inOrder = inOrder(newReporter);
             inOrder.verify(newReporter).info(
-                "Muting standard output temporarily to prevent " +
-                "external-library-generated logging \"noise\"."
-            );
-            inOrder.verify(newReporter).info(
                 "Parsed command-line argments: arg1=val1 arg2=val2."
             );
             inOrder.verify(newReporter).info(
                 "Starting PDF document generation."
-            );
-            inOrder.verify(newReporter).info(
-                "Unmuting standard output. It can now be written to again."
             );
         });
     }

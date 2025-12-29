@@ -19,9 +19,5 @@ interface Streams {
     InputStream loadResource(String path);
 
     String getExternalUrl(String path);
-
-    PrintStream muteStandardOut();
-
-    void unmuteStandardOut(PrintStream std);
     
 }

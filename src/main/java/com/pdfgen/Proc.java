@@ -1,21 +1,15 @@
 package com.pdfgen;
 
-import java.io.PrintStream;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 
 import com.beust.jcommander.ParameterException;
+import com.openhtmltopdf.util.XRLog;
 import com.pdfgen.cli.ArgParser;
 import com.pdfgen.cli.DefaultArgParser;
 import com.pdfgen.reporting.Reporter;
 import com.pdfgen.reporting.StandardReporter;
-
-@FunctionalInterface
-interface CheckedProcess {
-
-    void run() throws Exception;
-
-}
 
 class Proc {
 
@@ -32,12 +26,9 @@ class Proc {
     private boolean verbose;
 
     private CheckedProcess pdfGeneratorProc = () -> {
+        disableLogging();
         pdfGeneratorProvider.apply(parsedArgs).generate(verbose);
     };
-
-    private final Streams streams;
-
-    private PrintStream origOut;
 
     Proc(String[] args) { 
         this(
@@ -51,8 +42,7 @@ class Proc {
                     parsedArgs.getLocale(),
                     parsedArgs.getFont()
                 ),
-            new StandardReporter(),
-            new DefaultStreams()
+            new StandardReporter()
         );
     }
 
@@ -60,14 +50,12 @@ class Proc {
         String[] args, 
         ArgParser<Args> argParser, 
         Function<Args, PDFGenerator> pdfGeneratorProvider, 
-        Reporter reporter,
-        Streams streams
+        Reporter reporter
     ) { 
         this.args = args;
         this.argParser = argParser;
         this.pdfGeneratorProvider = pdfGeneratorProvider;
         this.reporter = reporter;
-        this.streams = streams;
     }
 
     void setArgs(String[] args) {
@@ -84,6 +72,12 @@ class Proc {
 
     void setReporter(Reporter reporter) {
         this.reporter = reporter;
+    }
+
+    private static void disableLogging() {
+        XRLog.listRegisteredLoggers().forEach(logger ->
+            XRLog.setLevel(logger, Level.OFF)
+        );
     }
 
     private <T> T run(Supplier<T> proc, String msg) {
@@ -110,10 +104,8 @@ class Proc {
         try {
             parsedArgs = run(() -> argParser.parse(args), Messages.parseArgs(args, " "));
             verbose = parsedArgs.getVerbose();
-            origOut = run(() -> streams.muteStandardOut(), Messages.muteOutput());
             tryInfo(Messages.parseArgs(args, " "));
             runVoid(pdfGeneratorProc, Messages.startPdfGeneration());
-            runVoid(() -> streams.unmuteStandardOut(origOut), Messages.unmuteOutput());
             trySuccess(Messages.success());
         } catch (Exception e) {
             handleException(e);
@@ -121,8 +113,6 @@ class Proc {
     }
 
     private void handleException(Exception e) {
-        if (origOut != null)
-            streams.unmuteStandardOut(origOut);
         if (e instanceof ParameterException) {
             reporter.error(e.getMessage());
             argParser.printUsage();
@@ -138,12 +128,7 @@ class Proc {
 
         private static final String PARSE_ARGS = "Parsed command-line argments: %s.";
         
-        private static final String MUTE_OUTPUT = "Muting standard output temporarily to prevent " +
-                                                  "external-library-generated logging \"noise\".";
-
         private static final String START_PDF_GENERATION = "Starting PDF document generation.";
-
-        private static final String UNMUTE_OUTPUT = "Unmuting standard output. It can now be written to again.";
 
         private static final String SUCCESS = "PDF generated successfully!";
 
@@ -153,16 +138,8 @@ class Proc {
             return String.format(PARSE_ARGS, String.join(delim, args));
         }
 
-        static String muteOutput() {
-            return MUTE_OUTPUT;
-        }
-
         static String startPdfGeneration() {
             return START_PDF_GENERATION;
-        }
-
-        static String unmuteOutput() {
-            return UNMUTE_OUTPUT;
         }
 
         static String success() {
