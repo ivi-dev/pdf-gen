@@ -127,7 +127,7 @@ public class DefaultDataPopulatorTest {
     void constructorInitializesObject() {
         assertNotNull(dataPopulator);
     }
-
+    
     @Test
     void setLocaleChangesTheLocale() {
         var newLocale = new Locale("en");
