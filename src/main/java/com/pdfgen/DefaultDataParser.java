@@ -25,7 +25,7 @@ class DefaultDataParser implements DataParser {
     }
 
     @Override
-    public org.w3c.dom.Document makeW3CDocument(Document dom) {
+    public org.w3c.dom.Document makeW3CDoc(Document dom) {
         return new W3CDom().fromJsoup(dom);
     }
 

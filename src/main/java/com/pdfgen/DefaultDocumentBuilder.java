@@ -15,6 +15,8 @@ import com.openhtmltopdf.extend.FSUriResolver;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 import com.pdfgen.converters.FontDeclaration;
+import com.pdfgen.reporting.ConditionalI18NReporter;
+import com.pdfgen.reporting.StandardConditionalI18NReporter;
 
 class DefaultDocumentBuilder implements DocumentBuilder {
 
@@ -25,6 +27,8 @@ class DefaultDocumentBuilder implements DocumentBuilder {
     private DataParser dataParser;
 
     private DataPopulator dataPopulator;
+
+    private ConditionalI18NReporter reporter;
 
     private List<FontDeclaration> fonts;    
 
@@ -51,7 +55,12 @@ class DefaultDocumentBuilder implements DocumentBuilder {
             new DefaultStreams(),
             new PdfRendererBuilder(),
             new DefaultDataParser(),
-            new DefaultDataPopulator(locale)
+            new DefaultDataPopulator(locale),
+            new StandardConditionalI18NReporter(
+                new StandardResourceBundleWrapper(
+                    "i18n.Messages"
+                )
+            )
         );
     }
 
@@ -61,7 +70,8 @@ class DefaultDocumentBuilder implements DocumentBuilder {
         Streams streams,
         PdfRendererBuilder pdfBuilder,
         DataParser dataParser,
-        DataPopulator dataPopulator
+        DataPopulator dataPopulator,
+        ConditionalI18NReporter reporter
     ) {
         this.dataFile = dataFile;
         this.fonts = resolveFonts(fonts);
@@ -79,6 +89,7 @@ class DefaultDocumentBuilder implements DocumentBuilder {
             };
         };
         fsUriResolver = (baseUri, uri) -> this.streams.getExternalUrl(uri);
+        this.reporter = reporter;
     }
 
     private List<FontDeclaration> resolveFonts(List<FontDeclaration> fonts) {
@@ -110,12 +121,20 @@ class DefaultDocumentBuilder implements DocumentBuilder {
     }
 
     @Override
-    public org.w3c.dom.Document makeW3CDoc(InputStream template) throws IOException {
+    public org.w3c.dom.Document makeW3CDoc(
+        InputStream template, 
+        boolean verbose
+    ) throws IOException {
+        reporter.setVerbose(verbose);
+        reporter.info("parsingTemplate");
         var dom = dataParser.parseTemplate(template);
+        reporter.info("populatingDate");
         dataPopulator.populateGenerationDate(dom);
+        reporter.info("parsingInputData", dataFile.getAbsolutePath());
         data = dataParser.parseInputData(dataFile);
+        reporter.info("populatingInputData");
         dataPopulator.populateData(dom, data, null);
-        return dataParser.makeW3CDocument(dom);
+        return dataParser.makeW3CDoc(dom);
     }
 
     private void loadFonts(PdfRendererBuilder builder) {

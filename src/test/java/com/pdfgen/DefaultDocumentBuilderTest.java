@@ -25,6 +25,7 @@ import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.extend.FSUriResolver;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.pdfgen.converters.FontDeclaration;
+import com.pdfgen.reporting.ConditionalI18NReporter;
 
 record UseFontArgs(
     @SuppressWarnings("rawtypes") List<FSSupplier> fsSuppliers, 
@@ -42,6 +43,8 @@ public class DefaultDocumentBuilderTest {
     private DataParser mockDataParser;
 
     private DataPopulator mockDataPopulator;
+
+    private ConditionalI18NReporter mockReporter = mock(ConditionalI18NReporter.class);
 
     private org.w3c.dom.Document w3cDoc;
     
@@ -95,7 +98,8 @@ public class DefaultDocumentBuilderTest {
             mockStreams,
             mockPdfBuilder,
             mockDataParser,
-            mockDataPopulator
+            mockDataPopulator,
+            mockReporter
         );
     }
 
@@ -199,7 +203,7 @@ public class DefaultDocumentBuilderTest {
         var docBuilder = initDocBuilder(declareFonts(CUSTOM_FONTS));
         var newMockDataFile = mock(File.class);
         docBuilder.setDataFile(newMockDataFile);
-        docBuilder.makeW3CDoc(mock(InputStream.class));
+        docBuilder.makeW3CDoc(mock(InputStream.class), true);
         verify(mockDataParser).parseInputData(newMockDataFile);
     }
 

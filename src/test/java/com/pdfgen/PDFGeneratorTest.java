@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.pdfgen.converters.FontDeclaration;
+import com.pdfgen.reporting.ConditionalI18NReporter;
 
 public class PDFGeneratorTest {
 
@@ -29,6 +30,8 @@ public class PDFGeneratorTest {
     private PdfRendererBuilder mockPdfRendererBuilder;
 
     private FileSystem mockFs;
+
+    private ConditionalI18NReporter mockReporter = mock(ConditionalI18NReporter.class);
 
     private PDFGenerator pdfGenerator;
 
@@ -44,7 +47,8 @@ public class PDFGeneratorTest {
             "My-Document", 
             mockStreams, 
             mockDocBuilder,
-            mockFs
+            mockFs,
+            mockReporter
         );
     }
     
