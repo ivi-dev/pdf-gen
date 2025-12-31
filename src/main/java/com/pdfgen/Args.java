@@ -68,7 +68,7 @@ class Args {
     )
     private boolean verbose = false;
 
-    private FieldValueGetter fieldValueGetter;
+    private FieldValueGetter fieldValueGetter = (field, obj) -> field.get(obj);
 
     private final Predicate<? super Field> nonBlankParams = (field) -> {
         try {
