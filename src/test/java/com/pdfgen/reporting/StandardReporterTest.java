@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class StandardReporterTest {
 
     private StandardReporter reporter;
-
+            
     private PrintStream originalErr;
     
     private ByteArrayOutputStream loggedMsg;
@@ -30,7 +30,11 @@ public class StandardReporterTest {
             var msg = "Info.";
             reporter.info(msg);
             assertEquals(
-                msg + System.lineSeparator(), 
+                String.format(
+                    "INFO: %s%s", 
+                    msg, 
+                    System.lineSeparator()
+                ), 
                 loggedMsg.toString()
             );
         } finally {
@@ -44,7 +48,11 @@ public class StandardReporterTest {
             var msg = "Error.";
             reporter.error(msg);
             assertEquals(
-                msg + System.lineSeparator(), 
+                String.format(
+                    "ERROR: %s%s", 
+                    msg, 
+                    System.lineSeparator()
+                ), 
                 loggedMsg.toString()
             );
         } finally {
@@ -58,7 +66,11 @@ public class StandardReporterTest {
             var msg = "Success.";
             reporter.success(msg);
             assertEquals(
-                msg + System.lineSeparator(), 
+                String.format(
+                    "SUCCESS: %s%s", 
+                    msg, 
+                    System.lineSeparator()
+                ), 
                 loggedMsg.toString()
             );
         } finally {

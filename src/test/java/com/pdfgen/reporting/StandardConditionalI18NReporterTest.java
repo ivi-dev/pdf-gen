@@ -63,9 +63,9 @@ public class StandardConditionalI18NReporterTest {
         var suffix = arg.isEmpty() ? "" : "-" + arg;
         assertEquals(
             String.format(
-                "[%s] - %s: I18N-%s%s%s", 
-                timestamp, 
+                "%s: [%s] - I18N-%s%s%s", 
                 prefix, 
+                timestamp, 
                 msg, 
                 suffix,
                 System.lineSeparator()

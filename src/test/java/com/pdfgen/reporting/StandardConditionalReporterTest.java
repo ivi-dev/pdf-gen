@@ -48,9 +48,9 @@ public class StandardConditionalReporterTest {
     private void assertMessageLogged(String prefix, String timestamp, String msg) {
         assertEquals(
             String.format(
-                "[%s] - %s: %s%s", 
-                timestamp, 
+                "%s: [%s] - %s%s", 
                 prefix, 
+                timestamp, 
                 msg, 
                 System.lineSeparator()
             ),

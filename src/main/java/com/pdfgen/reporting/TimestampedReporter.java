@@ -11,23 +11,19 @@ public class TimestampedReporter extends StandardReporter {
         );
     }
 
-    private static String line(String prefix, String msg) {
-        return String.format("[%s] - %s: %s", now(), prefix, msg);
-    }
-
     @Override
     public void info(String msg) {
-        super.info(line("INFO", msg));
+        super.info(String.format("[%s] - %s", now(), msg));
     }
 
     @Override
     public void error(String msg) {
-        super.error(line("ERROR", msg));
+        super.error(String.format("[%s] - %s", now(), msg));
     }
 
     @Override
     public void success(String msg) {
-        super.success(line("SUCCESS", msg));
+        super.success(String.format("[%s] - %s", now(), msg));
     }
 
 }
