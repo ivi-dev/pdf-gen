@@ -3,6 +3,7 @@ package com.pdfgen.converters;
 import java.util.Locale;
 
 import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
 
 public class LocaleConverter implements IStringConverter<java.util.Locale> {
 
@@ -18,7 +19,7 @@ public class LocaleConverter implements IStringConverter<java.util.Locale> {
             }
         }
         if (value.equals("")) {
-            return Locale.getDefault();
+            throw new ParameterException("A blank locale identifier provided.");
         } else {
             return new Locale(value);
         }

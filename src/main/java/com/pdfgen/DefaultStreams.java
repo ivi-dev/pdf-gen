@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -36,21 +34,6 @@ class DefaultStreams implements Streams {
     public String getExternalUrl(String path) {
         var resource = getClass().getResource("/" + path);
         return resource != null ? resource.toExternalForm() : null;
-    }
-
-    @Override
-    public StandardStreams muteStandardOuts() {
-        PrintStream out = System.out; 
-        PrintStream err = System.err; 
-        System.setOut(new PrintStream(OutputStream.nullOutputStream())); 
-        System.setErr(new PrintStream(OutputStream.nullOutputStream()));
-        return new StandardStreams(out, err);
-    }
-
-    @Override
-    public void unmuteStandardOuts(StandardStreams std) {
-        System.setOut(std.out()); 
-        System.setErr(std.err());
     }
 
 }

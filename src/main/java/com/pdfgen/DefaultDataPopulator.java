@@ -67,9 +67,20 @@ class DefaultDataPopulator implements DataPopulator {
                 selector_
             );
         } else if (value instanceof List) {
-            processList(doc, value, exclude, selector_);
+            processList(
+                doc, 
+                value, 
+                exclude, 
+                selector_
+            );
         } else {
-            processScalar(doc, value, listItemDOM, cleanKey, selector_);
+            processScalar(
+                doc, 
+                value, 
+                listItemDOM, 
+                cleanKey, 
+                selector_
+            );
         }
     }
 

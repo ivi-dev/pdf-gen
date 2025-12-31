@@ -13,6 +13,6 @@ interface DataParser {
 
     Map<String, Object> parseInputData(File file) throws IOException;
 
-    org.w3c.dom.Document makeW3CDocument(Document dom);
+    org.w3c.dom.Document makeW3CDoc(Document dom);
 
 }

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.pdfgen.converters.FontDeclaration;
+import com.pdfgen.reporting.ConditionalI18NReporter;
 
 public class PDFGeneratorTest {
 
@@ -29,6 +30,8 @@ public class PDFGeneratorTest {
     private PdfRendererBuilder mockPdfRendererBuilder;
 
     private FileSystem mockFs;
+
+    private ConditionalI18NReporter mockReporter = mock(ConditionalI18NReporter.class);
 
     private PDFGenerator pdfGenerator;
 
@@ -44,7 +47,8 @@ public class PDFGeneratorTest {
             "My-Document", 
             mockStreams, 
             mockDocBuilder,
-            mockFs
+            mockFs,
+            mockReporter
         );
     }
     
@@ -57,14 +61,14 @@ public class PDFGeneratorTest {
     @Test
     void resolveOutputFileNameResolvesNullToDefaultOutputFilename() throws Exception {
         pdfGenerator.setOutputFile(null);
-        pdfGenerator.generate();
+        pdfGenerator.generate(false);
         verify(mockStreams).newFileOutputStream("Document.pdf");
     }
 
     @Test
     void resolveOutputFileNameAddsFileExtension() throws Exception {
         pdfGenerator.setOutputFile("My-Document");
-        pdfGenerator.generate();
+        pdfGenerator.generate(false);
         verify(mockStreams).newFileOutputStream("My-Document.pdf");
     }
 
@@ -75,7 +79,7 @@ public class PDFGeneratorTest {
         when(mockFs.getPath(mockDirectory)).thenReturn(mockOutputPath);
         when(mockFs.isDirectory(mockOutputPath)).thenReturn(true);
         pdfGenerator.setOutputFile(mockDirectory);
-        pdfGenerator.generate();
+        pdfGenerator.generate(false);
         verify(mockStreams).newFileOutputStream(
             Path.of(mockDirectory, "Document.pdf").toString()
         );
@@ -83,7 +87,7 @@ public class PDFGeneratorTest {
     
     @Test
     void generateGeneratesPDFDocument() throws Exception {
-        pdfGenerator.generate();
+        pdfGenerator.generate(false);
         verify(mockPdfRendererBuilder).run();
     }
 
@@ -91,7 +95,7 @@ public class PDFGeneratorTest {
     void generateRethrowsExceptionThrownByGenerationProcess() throws Exception {
         var exceptionMessage = "IO exception!";
         doThrow(new IOException(exceptionMessage)).when(mockPdfRendererBuilder).run();
-        var exception = assertThrows(Exception.class, () -> pdfGenerator.generate());
+        var exception = assertThrows(Exception.class, () -> pdfGenerator.generate(false));
         assertEquals(exceptionMessage, exception.getMessage());
     }
 
@@ -99,7 +103,7 @@ public class PDFGeneratorTest {
     void setTemplatePathChangesTheTemplatePath() throws Exception {
         var mockTemplate = "New-Template.html";
         pdfGenerator.setTemplatePath(mockTemplate);
-        pdfGenerator.generate();
+        pdfGenerator.generate(false);
         verify(mockStreams).newInputStream(Path.of(mockTemplate));
     }
 
@@ -114,7 +118,7 @@ public class PDFGeneratorTest {
     void setOutputFileChangesTheOutputFile() throws Exception {
         var mockOutputFile = "New-Document.pdf";
         pdfGenerator.setOutputFile(mockOutputFile);
-        pdfGenerator.generate();
+        pdfGenerator.generate(false);
         verify(mockStreams).newFileOutputStream(mockOutputFile);
     }
 

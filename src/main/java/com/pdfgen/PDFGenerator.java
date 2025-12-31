@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Locale;
 
 import com.pdfgen.converters.FontDeclaration;
-
-
-// TODO: Implement custom exception handling...
+import com.pdfgen.reporting.ConditionalI18NReporter;
+import com.pdfgen.reporting.StandardConditionalI18NReporter;
 
 class PDFGenerator {
 
@@ -21,6 +20,8 @@ class PDFGenerator {
     private final DocumentBuilder docBuilder;
 
     private final FileSystem fs;
+
+    private ConditionalI18NReporter reporter;
 
     private static final String DEFAULT_OUTPUT_FILE = "Document.pdf";
 
@@ -65,7 +66,12 @@ class PDFGenerator {
                 locale, 
                 fonts
             ),
-            new DefaultFileSystem()
+            new DefaultFileSystem(),
+            new StandardConditionalI18NReporter(
+                new StandardResourceBundleWrapper(
+                    "i18n.Messages"
+                )
+            )
         );
     }
 
@@ -74,13 +80,15 @@ class PDFGenerator {
         String outputFile, 
         Streams streams,
         DocumentBuilder docBuilder,
-        FileSystem fs
+        FileSystem fs,
+        ConditionalI18NReporter reporter
     ) {
         this.templatePath = templatePath;
         this.fs = fs;
         this.outputFile = resolveOutputFileName(outputFile);
         this.streams = streams;
         this.docBuilder = docBuilder;
+        this.reporter = reporter;
     }
 
     private static String cleanOutputFileName(String path) {
@@ -121,13 +129,15 @@ class PDFGenerator {
         docBuilder.resetFont();
     }
 
-    public void generate() throws Exception {
+    public void generate(boolean verbose) throws Exception {
+        reporter.setVerbose(verbose);
         try {
+            reporter.info("readingDocumentTemplate", templatePath);
             try (var template = streams.newInputStream(Path.of(templatePath))) {
-                var w3cDoc = docBuilder.makeW3CDoc(template);
+                var w3cDoc = docBuilder.makeW3CDoc(template, verbose);
                 try (var out = streams.newFileOutputStream(outputFile)) {
-                    var builder = docBuilder.init(w3cDoc, out);
-                    builder.run();
+                    reporter.info("startDocumentGeneration", outputFile);
+                    docBuilder.init(w3cDoc, out).run();
                 }
             }
         } catch  (Exception e) { 

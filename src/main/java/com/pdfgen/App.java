@@ -1,26 +1,29 @@
 package com.pdfgen;
 
-import com.pdfgen.cli.DefaultArgParser;
-import com.pdfgen.reporting.StandardOutReporter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class App {
+
+    static {
+        disableLogging();
+    }
+
+    private static void disableLogging() {
+        // 1. Force Commons Logging (used by PDFBox) to do nothing
+        System.setProperty(
+            "org.apache.commons.logging.Log", 
+            "org.apache.commons.logging.impl.NoOpLog"
+        );
+        // 2. Silence the specific Java Util Logging (JUL) package
+        Logger.getLogger("org.apache.pdfbox").setLevel(Level.OFF);
+        Logger.getLogger("org.apache.fontbox").setLevel(Level.OFF);
+    }
 
     private App() { }
 
     public static void main(String[] args) {
-        new Proc().run(
-            args, 
-            new DefaultArgParser<>(new Args()), 
-            (parsedArgs) -> 
-                new PDFGenerator(
-                    parsedArgs.getTemplate(), 
-                    parsedArgs.getData(),
-                    parsedArgs.getOutput(), 
-                    parsedArgs.getLocale(),
-                    parsedArgs.getFont()
-                ),
-            new StandardOutReporter()
-        );
+        new Proc(args).run();
     }
     
 }

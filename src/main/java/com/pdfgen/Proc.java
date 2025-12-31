@@ -1,51 +1,110 @@
 package com.pdfgen;
 
 import java.util.function.Function;
+import java.util.logging.Level;
 
 import com.beust.jcommander.ParameterException;
+import com.openhtmltopdf.util.XRLog;
 import com.pdfgen.cli.ArgParser;
-import com.pdfgen.reporting.Reporter;
+import com.pdfgen.cli.DefaultArgParser;
+import com.pdfgen.reporting.ConditionalI18NReporter;
+import com.pdfgen.reporting.StandardConditionalI18NReporter;
 
 class Proc {
 
-    private final Streams streams;
+    private String[] args;
 
-    Proc() { 
-        this(new DefaultStreams());
+    private ArgParser<Args> argParser;
+
+    private Args parsedArgs;
+
+    private Function<Args, PDFGenerator> pdfGeneratorProvider;
+
+    private ConditionalI18NReporter reporter;
+
+    private boolean verbose;
+
+    private CheckedProcess pdfGeneratorProc = () -> {
+        disableLogging();
+        pdfGeneratorProvider.apply(parsedArgs).generate(verbose);
+    };
+
+    Proc(String[] args) { 
+        this(
+            args,
+            new DefaultArgParser<>(new Args()), 
+            (parsedArgs) -> 
+                new PDFGenerator(
+                    parsedArgs.getTemplate(), 
+                    parsedArgs.getData(),
+                    parsedArgs.getOutput(), 
+                    parsedArgs.getLocale(),
+                    parsedArgs.getFont()
+                ),
+            new StandardConditionalI18NReporter(
+                new StandardResourceBundleWrapper(
+                    "i18n.Messages"
+                )
+            )
+        );
     }
 
-    Proc(Streams streams) { 
-        this.streams = streams;
-    }
-
-     void run(
+    Proc(
         String[] args, 
         ArgParser<Args> argParser, 
         Function<Args, PDFGenerator> pdfGeneratorProvider, 
-        Reporter reporter
+        ConditionalI18NReporter reporter
+    ) { 
+        this.args = args;
+        this.argParser = argParser;
+        this.pdfGeneratorProvider = pdfGeneratorProvider;
+        this.reporter = reporter;
+    }
+
+    private static void disableLogging() {
+        XRLog.listRegisteredLoggers().forEach(logger ->
+            XRLog.setLevel(logger, Level.OFF)
+        );
+    }
+
+    void setArgs(String[] args) {
+        this.args = args;
+    }
+
+    void setArgParser(ArgParser<Args> argParser) {
+        this.argParser = argParser;
+    }
+
+    void setPdfGeneratorProvider(
+        Function<Args, PDFGenerator> pdfGeneratorProvider
     ) {
-        StandardStreams std = null;
+        this.pdfGeneratorProvider = pdfGeneratorProvider;
+    }
+
+    void setReporter(ConditionalI18NReporter reporter) {
+        this.reporter = reporter;
+    }
+
+     void run() {
         try {
-            std = streams.muteStandardOuts();
-            var parsedArgs = argParser.parse(args);
-            pdfGeneratorProvider.apply(parsedArgs).generate();
-            streams.unmuteStandardOuts(std);
-            reporter.reportSuccess("PDF generated successfully!");
+            parsedArgs = argParser.parse(args);
+            verbose = parsedArgs.getVerbose();
+            reporter.setVerbose(verbose);
+            reporter.info("finishedParsingArgs", parsedArgs);
+            pdfGeneratorProc.run();
+            reporter.success("documentGenerationSuccess");
         } catch (Exception e) {
-            handleException(e, reporter, argParser, streams, std);
+            handleException(e);
         }
     }
 
-    private static void handleException(
-        Exception e, 
-        Reporter reporter, 
-        ArgParser<Args> argParser,
-        Streams streams, 
-        StandardStreams std
-    ) {
-        streams.unmuteStandardOuts(std);
+    private void handleException(Exception e) {
         if (e instanceof ParameterException) {
-            reporter.reportError(e.getMessage());
+            reporter.setVerbose(true);
+            reporter.error(
+                "invalidCommandLineArgument", 
+                e.getMessage()
+            );
             argParser.printUsage();
             return;
         } 

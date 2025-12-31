@@ -12,7 +12,7 @@ import com.pdfgen.converters.FontDeclaration;
 
 interface DocumentBuilder {
 
-    org.w3c.dom.Document makeW3CDoc(InputStream template) throws IOException;
+    org.w3c.dom.Document makeW3CDoc(InputStream template, boolean verbose) throws IOException;
 
     PdfRendererBuilder init(org.w3c.dom.Document w3cDoc, FileOutputStream os);
 

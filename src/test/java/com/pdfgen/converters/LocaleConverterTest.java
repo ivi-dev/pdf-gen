@@ -1,10 +1,11 @@
 package com.pdfgen.converters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.Locale;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+
+import com.beust.jcommander.ParameterException;
 
 public class LocaleConverterTest {
 
@@ -34,8 +35,14 @@ public class LocaleConverterTest {
     @Test
     void convertParsesAnEmptyString() {
         var converter = new LocaleConverter();
-        var locale = converter.convert("");
-        assertEquals(Locale.getDefault().getLanguage(), locale.getLanguage());
+        var exception = assertThrows(
+            ParameterException.class, 
+            () -> converter.convert("").getLanguage()
+        );
+        assertEquals(
+            "A blank locale identifier provided.", 
+            exception.getMessage()
+        );
     }
 
 }
