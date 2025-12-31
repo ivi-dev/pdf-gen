@@ -101,17 +101,14 @@ class Proc {
     private void handleException(Exception e) {
         if (e instanceof ParameterException) {
             reporter.setVerbose(true);
-            reporter.error(e.getMessage());
+            reporter.error(
+                "invalidCommandLineArgument", 
+                e.getMessage()
+            );
             argParser.printUsage();
             return;
         } 
-        if (verbose)
-            e.printStackTrace();
-        else
-            reporter.error(
-                "documentGenerationFailed", 
-                e.getMessage()
-            );
+        e.printStackTrace();
     }
 
 }

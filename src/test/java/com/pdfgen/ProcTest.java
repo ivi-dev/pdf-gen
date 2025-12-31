@@ -154,26 +154,18 @@ class ProcTest {
         runProc(false, () -> {
             var inOrder = inOrder(reporter, argParser);
             verify(reporter).setVerbose(true);
-            inOrder.verify(reporter).error(excMsg);
+            inOrder.verify(reporter).error(
+                "invalidCommandLineArgument", 
+                excMsg
+            );
             inOrder.verify(argParser).printUsage();
         });
     }
 
     @Test
-    void runHandlesGeneralExceptionSilently() throws Exception {
+    void runHandlesGeneralException() throws Exception {
         var exc = makePdfGeneratorThrow(Exception.class);
         runProc(false, () -> {
-            verify(reporter).error(
-                "documentGenerationFailed", 
-                exc.getMessage()
-            );
-        });
-    }
-
-    @Test
-    void runHandlesGeneralExceptionVerbosely() throws Exception {
-        var exc = makePdfGeneratorThrow(Exception.class);
-        runProc(true, () -> {
             verify(exc).printStackTrace();
         });
     }
