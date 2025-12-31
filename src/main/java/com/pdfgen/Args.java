@@ -1,8 +1,12 @@
 package com.pdfgen;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.beust.jcommander.Parameter;
 import com.pdfgen.converters.FontConverter;
@@ -64,6 +68,40 @@ class Args {
     )
     private boolean verbose = false;
 
+    private FieldValueGetter fieldValueGetter;
+
+    private final Predicate<? super Field> nonBlankParams = (field) -> {
+        try {
+            if (field.isAnnotationPresent(Parameter.class)) {
+                var value = fieldValueGetter.get(field, this);
+                if (value instanceof Boolean)
+                    return (Boolean) value;
+                return value != null;
+            } 
+            return false;
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            return false;
+        }
+    };
+
+    private final Function<? super Field, String> fieldToString = (field) -> {
+        try {
+            var fieldValue = fieldValueGetter.get(field, this);
+            var fieldName = field.getName();
+            if (fieldValue instanceof List) {
+                var list = ((List<?>) fieldValue).stream().map((value) -> 
+                    String.format("--%s=%s", fieldName, value)
+                ).toList();
+                return String.join(", ", list);
+            } else if (fieldValue instanceof Boolean) {
+                return String.format("--%s", fieldName);
+            }
+            return String.format("--%s=%s", fieldName, fieldValue);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            return "";
+        }
+    };
+
     Args() { }
 
     Args(
@@ -74,12 +112,33 @@ class Args {
         List<FontDeclaration> font,
         boolean verbose
     ) {
+        this(
+            template,
+            data,
+            output,
+            locale,
+            font,
+            verbose,
+            (field, obj) -> field.get(obj)
+        );
+    }
+
+    Args(
+        String template, 
+        File data, 
+        String output, 
+        Locale locale, 
+        List<FontDeclaration> font,
+        boolean verbose,
+        FieldValueGetter fieldValueGetter
+    ) {
         this.template = template;
         this.data = data;
         this.output = output;
         this.locale = locale;
         this.font = font;
         this.verbose = verbose;
+        this.fieldValueGetter = fieldValueGetter;
     }
 
     String getTemplate() {
@@ -104,6 +163,19 @@ class Args {
 
     boolean getVerbose() {
         return verbose;
+    }
+
+    private String[] notNulls() {
+        return Arrays.stream(getClass().getDeclaredFields())
+                     .filter(nonBlankParams)
+                     .map(fieldToString)
+                     .filter((str) -> !str.isBlank())
+                     .toArray(String[]::new);
+    }
+
+    @Override
+    public String toString() {
+        return String.join(", ", notNulls());
     }
 
 }
