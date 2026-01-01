@@ -93,6 +93,7 @@
     </dependencies>
 
     <build>
+        <finalName>pdfgen</finalName>
         <resources>
             <!-- Include everything under src/main/resources -->
             <resource>
@@ -104,6 +105,23 @@
         </resources>
 
         <plugins>
+            <!-- Cleanup the target dir before building -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.4.0</version> <!-- Use the latest stable version -->
+                <executions>
+                    <execution>
+                        <?m2e ignore?>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Ensures the JAR has a manifest with the entry point -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -172,11 +190,11 @@
                 </executions>
                 <configuration>
                     <excludes>
-                    <exclude>com/pdfgen/App*</exclude>
-                    <exclude>com/pdfgen/StandartOutReporter*</exclude>
-                    <exclude>com/pdfgen/cli/DefaultAppEngine*</exclude>
-                    <exclude>com/pdfgen/DefaultStreams*</exclude>
-                    <exclude>com/pdfgen/DefaultDataParser*</exclude>
+                        <exclude>com/pdfgen/App*</exclude>
+                        <exclude>com/pdfgen/StandartOutReporter*</exclude>
+                        <exclude>com/pdfgen/cli/DefaultAppEngine*</exclude>
+                        <exclude>com/pdfgen/DefaultStreams*</exclude>
+                        <exclude>com/pdfgen/DefaultDataParser*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
