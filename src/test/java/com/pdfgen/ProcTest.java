@@ -76,6 +76,9 @@ class ProcTest {
     void setArgsChangesInputArguments() throws Exception {
         var newArgs = new String[] { "newArg1=newVal1" };
         proc.setArgs(newArgs);
+        var newParsedArgs = mock(Args.class);
+        when(newParsedArgs.getVerbose()).thenReturn(false);
+        when(argParser.parse(newArgs)).thenReturn(newParsedArgs);
         runProc(false, () -> {
             verify(argParser).parse(newArgs);
         });
@@ -85,6 +88,9 @@ class ProcTest {
     @Test
     void setArgParserChangesTheArgumentParser() throws Exception {
         var newArgParser = mock(DefaultArgParser.class);
+        var newParsedArgs = mock(Args.class);
+        when(newParsedArgs.getVerbose()).thenReturn(false);
+        when(newArgParser.parse(args)).thenReturn(newParsedArgs);
         proc.setArgParser(newArgParser);
         runProc(false, () -> {
             verify(newArgParser).parse(args);
