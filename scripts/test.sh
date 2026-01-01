@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mvn clean test jacoco:report
+mvn test jacoco:report
