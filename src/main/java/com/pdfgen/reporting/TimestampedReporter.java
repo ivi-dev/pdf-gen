@@ -3,7 +3,7 @@ package com.pdfgen.reporting;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class TimestampedReporter extends StandardReporter {
+public class TimestampedReporter extends PrefixedReporter {
 
     private static String now() {
         return LocalDateTime.now().format(
