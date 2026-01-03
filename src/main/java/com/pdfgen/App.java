@@ -1,13 +1,10 @@
 package com.pdfgen;
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class App {
-
-    static {
-        disableLogging();
-    }
 
     private static void disableLogging() {
         // 1. Force Commons Logging (used by PDFBox) to do nothing
@@ -23,6 +20,9 @@ public class App {
     private App() { }
 
     public static void main(String[] args) {
+        if (!Arrays.asList(args).contains("--verbose")) {
+            disableLogging();
+        }
         new Proc(args).run();
     }
     
