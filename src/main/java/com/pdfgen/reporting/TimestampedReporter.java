@@ -13,17 +13,17 @@ public class TimestampedReporter extends StandardReporter {
 
     @Override
     public void info(String msg) {
-        super.info(String.format("[%s] - %s", now(), msg));
+        super.info(String.format("[%s] %s", now(), msg));
     }
 
     @Override
     public void error(String msg) {
-        super.error(String.format("[%s] - %s", now(), msg));
+        super.error(String.format("[%s] %s", now(), msg));
     }
 
     @Override
     public void success(String msg) {
-        super.success(String.format("[%s] - %s", now(), msg));
+        super.success(String.format("[%s] %s", now(), msg));
     }
 
 }
