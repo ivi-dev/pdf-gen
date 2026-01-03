@@ -4,7 +4,7 @@ import com.beust.jcommander.ParameterException;
 
 interface AppEngine<T> {
 
-    void printUsage();
+    String getUsage();
 
     T parseArgs(String[] args) throws ParameterException;
     

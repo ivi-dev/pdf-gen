@@ -31,8 +31,11 @@ class DefaultAppEngine<T> implements AppEngine<T> {
     }
 
     @Override
-    public void printUsage() {
-        app.usage();
+    public String getUsage(){
+        app.setProgramName("pdfgen");
+        var sb = new StringBuilder();
+        app.usage(sb);
+        return sb.toString();
     }
 
     @Override

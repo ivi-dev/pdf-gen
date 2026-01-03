@@ -123,6 +123,16 @@ class ProcTest {
     }
 
     @Test
+    void runPrintsHelpInfo() throws Exception {
+        when(parsedArgs.getHelp()).thenReturn(true);
+        runProc(false, () -> { 
+            var inOrder = inOrder(reporter);
+            inOrder.verify(reporter).setVerbose(true);
+            inOrder.verify(reporter).setVerbose(false);
+        });
+    }
+
+    @Test
     void runCompletesSilently() throws Exception {
         runProc(false, () -> { 
             var inOrder = inOrder(reporter, pdfGenerator);
@@ -157,14 +167,14 @@ class ProcTest {
         String excMsg = "Parameter error";
         var paramEx = new ParameterException(excMsg);
         when(argParser.parse(args)).thenThrow(paramEx);
+        when(argParser.getUsage()).thenReturn("Mocked usage message");
         runProc(false, () -> {
             var inOrder = inOrder(reporter, argParser);
             verify(reporter).setVerbose(true);
             inOrder.verify(reporter).error(
                 "invalidCommandLineArgument", 
-                excMsg
+                "Mocked usage message"
             );
-            inOrder.verify(argParser).printUsage();
         });
     }
 

@@ -19,8 +19,8 @@ public class DefaultArgParser<T> implements ArgParser<T> {
     }
 
     @Override
-    public void printUsage() {
-        app.printUsage();
+    public String getUsage() {
+        return app.getUsage();
     }
 
     @Override

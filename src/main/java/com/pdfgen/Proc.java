@@ -8,6 +8,7 @@ import com.openhtmltopdf.util.XRLog;
 import com.pdfgen.cli.ArgParser;
 import com.pdfgen.cli.DefaultArgParser;
 import com.pdfgen.reporting.ConditionalI18NReporter;
+import com.pdfgen.reporting.MinimalReporter;
 import com.pdfgen.reporting.StandardConditionalI18NReporter;
 
 class Proc {
@@ -85,9 +86,19 @@ class Proc {
         this.reporter = reporter;
     }
 
+    private void printHelp() {
+        reporter.setVerbose(true);
+        new MinimalReporter().info(argParser.getUsage()); // ?
+        reporter.setVerbose(false);
+    }
+
      void run() {
         try {
             parsedArgs = argParser.parse(args);
+            if (parsedArgs.getHelp()) {
+                printHelp();
+                return;
+            }
             verbose = parsedArgs.getVerbose();
             reporter.setVerbose(verbose);
             reporter.info("finishedParsingArgs", parsedArgs);
@@ -103,9 +114,8 @@ class Proc {
             reporter.setVerbose(true);
             reporter.error(
                 "invalidCommandLineArgument", 
-                e.getMessage()
+                argParser.getUsage()
             );
-            argParser.printUsage();
             return;
         } 
         e.printStackTrace();

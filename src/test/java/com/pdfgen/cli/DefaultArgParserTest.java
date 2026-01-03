@@ -38,13 +38,13 @@ public class DefaultArgParserTest {
     }
 
     @Test
-    void printsUsagePrintsAppUsageInfo() {
+    void getUsageReturnsAppUsageInfo() {
         var args = new MockArgs();
         var appEngine = mock(AppEngine.class);
         @SuppressWarnings("unchecked")
         var argParser = new DefaultArgParser<MockArgs>(args, appEngine);
-        argParser.printUsage();
-        verify(appEngine).printUsage();
+        argParser.getUsage();
+        verify(appEngine).getUsage();
     }
 
 }
