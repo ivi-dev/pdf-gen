@@ -15,8 +15,8 @@ import com.openhtmltopdf.extend.FSUriResolver;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 import com.pdfgen.converters.FontDeclaration;
-import com.pdfgen.reporting.ConditionalI18NReporter;
-import com.pdfgen.reporting.StandardConditionalI18NReporter;
+import com.pdfgen.reporting.ConditionalReporter;
+import com.pdfgen.reporting.StandardConditionalTimestampedI18NReporter;
 
 class DefaultDocumentBuilder implements DocumentBuilder {
 
@@ -28,7 +28,7 @@ class DefaultDocumentBuilder implements DocumentBuilder {
 
     private DataPopulator dataPopulator;
 
-    private ConditionalI18NReporter reporter;
+    private ConditionalReporter reporter;
 
     private List<FontDeclaration> fonts;    
 
@@ -56,7 +56,7 @@ class DefaultDocumentBuilder implements DocumentBuilder {
             new PdfRendererBuilder(),
             new DefaultDataParser(),
             new DefaultDataPopulator(locale),
-            new StandardConditionalI18NReporter(
+            new StandardConditionalTimestampedI18NReporter(
                 new StandardResourceBundleWrapper(
                     "i18n.Messages"
                 )
@@ -71,7 +71,7 @@ class DefaultDocumentBuilder implements DocumentBuilder {
         PdfRendererBuilder pdfBuilder,
         DataParser dataParser,
         DataPopulator dataPopulator,
-        ConditionalI18NReporter reporter
+        ConditionalReporter reporter
     ) {
         this.dataFile = dataFile;
         this.fonts = resolveFonts(fonts);

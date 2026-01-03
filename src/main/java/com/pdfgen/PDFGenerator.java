@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Locale;
 
 import com.pdfgen.converters.FontDeclaration;
-import com.pdfgen.reporting.ConditionalI18NReporter;
-import com.pdfgen.reporting.StandardConditionalI18NReporter;
+import com.pdfgen.reporting.ConditionalReporter;
+import com.pdfgen.reporting.StandardConditionalTimestampedI18NReporter;
 
 class PDFGenerator {
 
@@ -21,7 +21,7 @@ class PDFGenerator {
 
     private final FileSystem fs;
 
-    private ConditionalI18NReporter reporter;
+    private ConditionalReporter reporter;
 
     private static final String DEFAULT_OUTPUT_FILE = "Document.pdf";
 
@@ -67,7 +67,7 @@ class PDFGenerator {
                 fonts
             ),
             new DefaultFileSystem(),
-            new StandardConditionalI18NReporter(
+            new StandardConditionalTimestampedI18NReporter(
                 new StandardResourceBundleWrapper(
                     "i18n.Messages"
                 )
@@ -81,7 +81,7 @@ class PDFGenerator {
         Streams streams,
         DocumentBuilder docBuilder,
         FileSystem fs,
-        ConditionalI18NReporter reporter
+        ConditionalReporter reporter
     ) {
         this.templatePath = templatePath;
         this.fs = fs;
