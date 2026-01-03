@@ -36,7 +36,7 @@ class Args {
     private String output = "Document.pdf";
 
     @Parameter(
-        names = {"--argLocale", "-l"}, 
+        names = {"--locale", "-l"}, 
         converter = LocaleConverter.class, 
         descriptionKey = "argLocale",
         order = 3
