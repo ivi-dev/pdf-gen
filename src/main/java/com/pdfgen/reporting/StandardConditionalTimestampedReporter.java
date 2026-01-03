@@ -1,16 +1,16 @@
 package com.pdfgen.reporting;
 
-public class StandardConditionalReporter 
+public class StandardConditionalTimestampedReporter 
     extends TimestampedReporter 
     implements ConditionalReporter {
 
     private boolean verbose = false;
 
-    public StandardConditionalReporter() {
+    public StandardConditionalTimestampedReporter() {
         super();
     }
 
-    StandardConditionalReporter(boolean verbose) {
+    StandardConditionalTimestampedReporter(boolean verbose) {
         super();
         this.verbose = verbose;
     }
