@@ -11,10 +11,6 @@ public class Reporters {
         this.reporters = reporters;
     }
 
-    public Reporter get(String name) {
-        return reporters.get(name);
-    }
-
     public void invoke(String reporterName, Consumer<Reporter> proc) {
         proc.accept(reporters.get(reporterName));
     }
