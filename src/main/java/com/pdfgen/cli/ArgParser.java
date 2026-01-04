@@ -4,7 +4,7 @@ import com.beust.jcommander.ParameterException;
 
 public interface ArgParser<T> {
 
-    void printUsage();
+    String getUsage();
 
     T parse(String[] args) throws ParameterException;
     

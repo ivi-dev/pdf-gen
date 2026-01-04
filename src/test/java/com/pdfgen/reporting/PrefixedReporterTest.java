@@ -8,9 +8,9 @@ import java.io.PrintStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class StandardReporterTest {
+public class PrefixedReporterTest {
 
-    private StandardReporter reporter;
+    private PrefixedReporter reporter;
             
     private PrintStream originalErr;
     
@@ -18,7 +18,7 @@ public class StandardReporterTest {
 
     @BeforeEach
     void setUp() {
-        reporter = new StandardReporter();
+        reporter = new PrefixedReporter();
         originalErr = System.err;
         loggedMsg = new ByteArrayOutputStream();
         System.setErr(new PrintStream(loggedMsg));

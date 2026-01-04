@@ -1,5 +1,6 @@
 package com.pdfgen;
 
+import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
 
@@ -7,8 +8,10 @@ import com.beust.jcommander.ParameterException;
 import com.openhtmltopdf.util.XRLog;
 import com.pdfgen.cli.ArgParser;
 import com.pdfgen.cli.DefaultArgParser;
-import com.pdfgen.reporting.ConditionalI18NReporter;
-import com.pdfgen.reporting.StandardConditionalI18NReporter;
+import com.pdfgen.reporting.ConditionalReporter;
+import com.pdfgen.reporting.MinimalReporter;
+import com.pdfgen.reporting.Reporters;
+import com.pdfgen.reporting.StandardConditionalTimestampedI18NReporter;
 
 class Proc {
 
@@ -20,12 +23,12 @@ class Proc {
 
     private Function<Args, PDFGenerator> pdfGeneratorProvider;
 
-    private ConditionalI18NReporter reporter;
+    private Reporters reporters;
 
     private boolean verbose;
 
     private CheckedProcess pdfGeneratorProc = () -> {
-        disableLogging();
+        if (!verbose) disableLogging();
         pdfGeneratorProvider.apply(parsedArgs).generate(verbose);
     };
 
@@ -41,9 +44,16 @@ class Proc {
                     parsedArgs.getLocale(),
                     parsedArgs.getFont()
                 ),
-            new StandardConditionalI18NReporter(
-                new StandardResourceBundleWrapper(
-                    "i18n.Messages"
+            new Reporters(
+                Map.of(
+                    "conditionalTimestampedI18N",
+                    new StandardConditionalTimestampedI18NReporter(
+                        new StandardResourceBundleWrapper(
+                            "i18n.Messages"
+                        )
+                    ),
+                    "minimal",
+                    new MinimalReporter()
                 )
             )
         );
@@ -53,12 +63,12 @@ class Proc {
         String[] args, 
         ArgParser<Args> argParser, 
         Function<Args, PDFGenerator> pdfGeneratorProvider, 
-        ConditionalI18NReporter reporter
+        Reporters reporters
     ) { 
         this.args = args;
         this.argParser = argParser;
         this.pdfGeneratorProvider = pdfGeneratorProvider;
-        this.reporter = reporter;
+        this.reporters = reporters;
     }
 
     private static void disableLogging() {
@@ -81,18 +91,47 @@ class Proc {
         this.pdfGeneratorProvider = pdfGeneratorProvider;
     }
 
-    void setReporter(ConditionalI18NReporter reporter) {
-        this.reporter = reporter;
+    void setReporters(Reporters reporters) {
+        this.reporters = reporters;
+    }
+
+    private void setVerbose(boolean verbose) {
+        reporters.invoke(
+            "conditionalTimestampedI18N", 
+            (reporter) -> (
+                (ConditionalReporter) reporter
+            ).setVerbose(verbose)
+        );
+    }
+
+    private void printUsage() {
+        setVerbose(true);
+        reporters.info(
+            "minimal", 
+            argParser.getUsage()
+        );
+        setVerbose(false);
     }
 
      void run() {
         try {
             parsedArgs = argParser.parse(args);
+            if (parsedArgs.getHelp()) {
+                printUsage();
+                return;
+            }
             verbose = parsedArgs.getVerbose();
-            reporter.setVerbose(verbose);
-            reporter.info("finishedParsingArgs", parsedArgs);
+            setVerbose(verbose);
+            reporters.info(
+                "conditionalTimestampedI18N", 
+                "finishedParsingArgs", 
+                parsedArgs
+            );
             pdfGeneratorProc.run();
-            reporter.success("documentGenerationSuccess");
+            reporters.success(
+                "conditionalTimestampedI18N",
+                "documentGenerationSuccess"
+            );
         } catch (Exception e) {
             handleException(e);
         }
@@ -100,12 +139,13 @@ class Proc {
 
     private void handleException(Exception e) {
         if (e instanceof ParameterException) {
-            reporter.setVerbose(true);
-            reporter.error(
+            setVerbose(true);
+            reporters.error(
+                "conditionalTimestampedI18N",
                 "invalidCommandLineArgument", 
-                e.getMessage()
+                argParser.getUsage()
             );
-            argParser.printUsage();
+            setVerbose(verbose);
             return;
         } 
         e.printStackTrace();

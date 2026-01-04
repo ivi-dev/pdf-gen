@@ -2,13 +2,12 @@ package com.pdfgen.reporting;
 
 import com.pdfgen.ResourceBundleWrapper;
 
-public class StandardConditionalI18NReporter 
-    extends StandardConditionalReporter 
-    implements ConditionalI18NReporter {
+public class StandardConditionalTimestampedI18NReporter 
+    extends StandardConditionalTimestampedReporter {
 
     private ResourceBundleWrapper resBundle;
 
-    public StandardConditionalI18NReporter(
+    public StandardConditionalTimestampedI18NReporter(
         ResourceBundleWrapper resBundle
     ) {
         super();

@@ -1,7 +1,8 @@
 package com.pdfgen.reporting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -18,9 +19,11 @@ import org.mockito.MockedStatic;
 
 import com.pdfgen.ResourceBundleWrapper;
 
-public class StandardConditionalI18NReporterTest {
+public class StandardConditionalTimestampedI18NReporterTest {
 
-    private StandardConditionalI18NReporter reporter;
+    private StandardConditionalTimestampedI18NReporter reporter;
+
+    private ResourceBundleWrapper resBundle;
 
     private PrintStream originalErr;
     
@@ -28,14 +31,14 @@ public class StandardConditionalI18NReporterTest {
 
     @BeforeEach
     void setUp() {
-        var resBundleWrapMock = mock(ResourceBundleWrapper.class);
-        when(resBundleWrapMock.getString("Info")).thenReturn("I18N-Info");
-        when(resBundleWrapMock.getString("Info", "arg1")).thenReturn("I18N-Info-arg1");
-        when(resBundleWrapMock.getString("Error")).thenReturn("I18N-Error");
-        when(resBundleWrapMock.getString("Error", "arg1")).thenReturn("I18N-Error-arg1");
-        when(resBundleWrapMock.getString("Success")).thenReturn("I18N-Success");
-        when(resBundleWrapMock.getString("Success", "arg1")).thenReturn("I18N-Success-arg1");
-        reporter = new StandardConditionalI18NReporter(resBundleWrapMock);
+        resBundle = mock(ResourceBundleWrapper.class);
+        when(resBundle.getString(eq("Info."))).thenReturn("Info resource.");
+        when(resBundle.getString(eq("Info."), anyString())).thenReturn("Templated info resource.");
+        when(resBundle.getString(eq("Error."))).thenReturn("Error resource.");
+        when(resBundle.getString(eq("Error."), anyString())).thenReturn("Templated error resource.");
+        when(resBundle.getString(eq("Success."))).thenReturn("Success resource.");
+        when(resBundle.getString(eq("Success."), anyString())).thenReturn("Templated success resource.");
+        reporter = new StandardConditionalTimestampedI18NReporter(resBundle);
         originalErr = System.err;
         loggedMsg = new ByteArrayOutputStream();
         System.setErr(new PrintStream(loggedMsg));
@@ -54,20 +57,13 @@ public class StandardConditionalI18NReporterTest {
         return timestamp;
     }
 
-    private void assertMessageLogged(
-        String prefix, 
-        String timestamp, 
-        String msg, 
-        String arg
-    ) {
-        var suffix = arg.isEmpty() ? "" : "-" + arg;
+    private void assertMessageLogged(String prefix, String timestamp, String msg) {
         assertEquals(
             String.format(
-                "%s: [%s] - I18N-%s%s%s", 
+                "%s: [%s] %s%s", 
                 prefix, 
                 timestamp, 
                 msg, 
-                suffix,
                 System.lineSeparator()
             ),
             loggedMsg.toString()
@@ -75,30 +71,24 @@ public class StandardConditionalI18NReporterTest {
     }
 
     @Test
-    void constructorInitializesObject() {
-        assertNotNull(reporter);
-    }
-
-    @Test
-    void infoWritesToStandardErrWhenVerbose() {
+    void infoWritesSimpleStringToStandardErrWhenVerbose() {
         reporter.setVerbose(true);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             var timestamp = mockLocalDateTime(mockLocalDateTime);
-            var msg = "Info";
+            var msg = "Info.";
             reporter.info(msg);
-            assertMessageLogged("INFO", timestamp, msg, "");
+            assertMessageLogged("INFO", timestamp, "Info resource.");
         }
     }
 
     @Test
-    void infoWritesParameterizedMessageToStandardErrWhenVerbose() {
+    void infoWritesTemplatedStringToStandardErrWhenVerbose() {
         reporter.setVerbose(true);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             var timestamp = mockLocalDateTime(mockLocalDateTime);
-            var msg = "Info";
-            var arg = "arg1";
-            reporter.info(msg, arg);
-            assertMessageLogged("INFO", timestamp, msg, arg);
+            var msg = "Info.";
+            reporter.info(msg, "include");
+            assertMessageLogged("INFO", timestamp, "Templated info resource.");
         }
     }
 
@@ -107,32 +97,20 @@ public class StandardConditionalI18NReporterTest {
         reporter.setVerbose(false);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             mockLocalDateTime(mockLocalDateTime);
-            var msg = "Info";
+            var msg = "Info.";
             reporter.info(msg);
             assertEquals("", loggedMsg.toString()); 
         }
     }
 
     @Test
-    void errorWritesToStandardErrWhenVerbose() {
+    void errorWritesSimpleStringToStandardErrWhenVerbose() {
         reporter.setVerbose(true);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             var timestamp = mockLocalDateTime(mockLocalDateTime);
-            var msg = "Error";
+            var msg = "Error.";
             reporter.error(msg);
-            assertMessageLogged("ERROR", timestamp, msg, "");
-        }
-    }
-
-    @Test
-    void errorWritesParameterizedMessageToStandardErrWhenVerbose() {
-        reporter.setVerbose(true);
-        try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
-            var timestamp = mockLocalDateTime(mockLocalDateTime);
-            var msg = "Error";
-            var arg = "arg1";
-            reporter.error(msg, arg);
-            assertMessageLogged("ERROR", timestamp, msg, arg);
+            assertMessageLogged("ERROR", timestamp, "Error resource.");
         }
     }
 
@@ -141,32 +119,31 @@ public class StandardConditionalI18NReporterTest {
         reporter.setVerbose(false);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             mockLocalDateTime(mockLocalDateTime);
-            var msg = "Error";
+            var msg = "Error.";
             reporter.error(msg);
             assertEquals("", loggedMsg.toString()); 
         }
     }
 
     @Test
-    void successWritesToStandardErrWhenVerbose() {
+    void errorWritesTemplatedStringToStandardErrWhenVerbose() {
         reporter.setVerbose(true);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             var timestamp = mockLocalDateTime(mockLocalDateTime);
-            var msg = "Success";
-            reporter.success(msg);
-            assertMessageLogged("SUCCESS", timestamp, msg, "");
+            var msg = "Error.";
+            reporter.error(msg, "include");
+            assertMessageLogged("ERROR", timestamp, "Templated error resource.");
         }
     }
 
     @Test
-    void successWritesParameterizedMessageToStandardErrWhenVerbose() {
+    void successWritesSimpleStringToStandardErrWhenVerbose() {
         reporter.setVerbose(true);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             var timestamp = mockLocalDateTime(mockLocalDateTime);
-            var msg = "Success";
-            var arg = "arg1";
-            reporter.success(msg, arg);
-            assertMessageLogged("SUCCESS", timestamp, msg, arg);
+            var msg = "Success.";
+            reporter.success(msg);
+            assertMessageLogged("SUCCESS", timestamp, "Success resource.");
         }
     }
 
@@ -175,9 +152,20 @@ public class StandardConditionalI18NReporterTest {
         reporter.setVerbose(false);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             mockLocalDateTime(mockLocalDateTime);
-            var msg = "Success";
+            var msg = "Success.";
             reporter.success(msg);
             assertEquals("", loggedMsg.toString());
+        }
+    }
+
+    @Test
+    void successWritesTemplatedStringToStandardErrWhenVerbose() {
+        reporter.setVerbose(true);
+        try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
+            var timestamp = mockLocalDateTime(mockLocalDateTime);
+            var msg = "Success.";
+            reporter.success(msg, "include");
+            assertMessageLogged("SUCCESS", timestamp, "Templated success resource.");
         }
     }
 

@@ -25,7 +25,7 @@ import com.openhtmltopdf.extend.FSSupplier;
 import com.openhtmltopdf.extend.FSUriResolver;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.pdfgen.converters.FontDeclaration;
-import com.pdfgen.reporting.ConditionalI18NReporter;
+import com.pdfgen.reporting.ConditionalReporter;
 
 record UseFontArgs(
     @SuppressWarnings("rawtypes") List<FSSupplier> fsSuppliers, 
@@ -44,7 +44,7 @@ public class DefaultDocumentBuilderTest {
 
     private DataPopulator mockDataPopulator;
 
-    private ConditionalI18NReporter mockReporter = mock(ConditionalI18NReporter.class);
+    private ConditionalReporter mockReporter = mock(ConditionalReporter.class);
 
     private org.w3c.dom.Document w3cDoc;
     

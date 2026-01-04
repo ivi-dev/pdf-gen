@@ -2,16 +2,12 @@ package com.pdfgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -48,13 +44,30 @@ public class ArgsTest {
             "document.pdf", 
             new Locale("bg"),
             fonts,
-            true
+            true,
+            false
         );
     } 
 
     @Test
     void parameterlessConstructorInitializesObject() {
         assertNotNull(new Args());
+    }
+
+    @Test
+    void primaryConstructorInitializesObject() {
+        assertNotNull(
+            new Args(
+                "custom-template.html",
+                mockDataFile,
+                null, 
+                null,
+                fonts,
+                true,
+                false,
+                (args) -> mock(ClassFieldsInspector.class)
+            )
+        );
     }
     
     @Test
@@ -93,66 +106,37 @@ public class ArgsTest {
     }
 
     @Test
-    void toStringRepresentsNonNullArgumentsWithNonThrowingFieldValueGetter() {
+    void getHelpReturnsCorrectValue() {
+        assertEquals(false, parsedArgs.getHelp());
+    }
+
+    @Test
+    void toStringRepresentsNonNullArgumentsWithParameterlessConstructor() {
+        var args = new Args();
+        assertEquals(
+            "--output=Document.pdf, " +
+            "--locale=en_US",
+            args.toString()
+        );
+    }
+
+    @Test
+    void toStringRepresentsNonNullArgumentsWithParameterizedConstructor() {
         var args = new Args(
             "custom-template.html",
             mockDataFile,
             null, 
             null,
             fonts,
-            true
+            true,
+            false
         );
         assertEquals(
             "--template=custom-template.html, " +
             "--data=/path/to/data.json, " +
             "--font=\"Font-1 /path/to/font-1.ttf\", " +
             "--font=\"Font-2 /path/to/font-2.ttf\", " +
-            "--verbose", 
-            args.toString()
-        );
-    }
-
-    @Test
-    void toStringRepresentsNonNullArgumentsWithThrowingFieldValueGetter() 
-        throws IllegalArgumentException, IllegalAccessException {
-        var mockFieldValueGetter = mock(FieldValueGetter.class);
-        var callCtr = new AtomicInteger(0);
-        doAnswer(invocation -> {
-            Field field = invocation.getArgument(0);
-            return switch (field.getName()) {
-                case "template" -> "custom-template.html";
-                case "data"     -> mockDataFile;
-                case "output"     -> throw new IllegalAccessException();
-                case "locale"     -> {
-                    var nCalls = callCtr.incrementAndGet();
-                    if (nCalls == 1) {
-                        yield new Locale("bg");
-                    } else {
-                        throw new IllegalAccessException();
-                    }
-                }
-                case "font"     -> fonts;
-                case "verbose"  -> false;
-                default         -> null;
-            };
-        }).when(mockFieldValueGetter).get(
-            any(Field.class), 
-            any(Args.class)
-        );
-        var args = new Args(
-            "custom-template.html",
-            mockDataFile,
-            "/path/to/document.pdf", 
-            new Locale("bg"),
-            fonts,
-            false,
-            mockFieldValueGetter
-        );
-        assertEquals(
-            "--template=custom-template.html, " +
-            "--data=/path/to/data.json, " +
-            "--font=\"Font-1 /path/to/font-1.ttf\", " +
-            "--font=\"Font-2 /path/to/font-2.ttf\"", 
+            "--verbose",
             args.toString()
         );
     }

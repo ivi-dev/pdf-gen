@@ -16,9 +16,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-public class StandardConditionalReporterTest {
+public class StandardConditionalTimestampedReporterTest {
 
-    private StandardConditionalReporter reporter;
+    private StandardConditionalTimestampedReporter reporter;
 
     private PrintStream originalErr;
     
@@ -26,7 +26,7 @@ public class StandardConditionalReporterTest {
 
     @BeforeEach
     void setUp() {
-        reporter = new StandardConditionalReporter();
+        reporter = new StandardConditionalTimestampedReporter();
         originalErr = System.err;
         loggedMsg = new ByteArrayOutputStream();
         System.setErr(new PrintStream(loggedMsg));
@@ -48,7 +48,7 @@ public class StandardConditionalReporterTest {
     private void assertMessageLogged(String prefix, String timestamp, String msg) {
         assertEquals(
             String.format(
-                "%s: [%s] - %s%s", 
+                "%s: [%s] %s%s", 
                 prefix, 
                 timestamp, 
                 msg, 
@@ -65,7 +65,7 @@ public class StandardConditionalReporterTest {
 
     @Test
     void secondaryConstructorInitializesObject() {
-        var reporter = new StandardConditionalReporter(true);
+        var reporter = new StandardConditionalTimestampedReporter(true);
         try (var mockLocalDateTime = mockStatic(LocalDateTime.class)) {
             var timestamp = mockLocalDateTime(mockLocalDateTime);
             var msg = "Info.";
