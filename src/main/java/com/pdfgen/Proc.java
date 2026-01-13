@@ -117,7 +117,7 @@ class Proc {
         setVerbose(true);
         reporters.info(
             "minimal", 
-            argParser.getVersion()
+            argParser.getMetaData()
         );
         setVerbose(false);
     }

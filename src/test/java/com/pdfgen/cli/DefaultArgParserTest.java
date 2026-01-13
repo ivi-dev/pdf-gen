@@ -48,13 +48,12 @@ public class DefaultArgParserTest {
     }
 
     @Test
-    void getVersionReturnsVersionInfo() {
+    void getMetaDataReturnsAppMetaData() {
         var appEngine = mock(AppEngine.class);
-        var metaProvider = mock(AppMetaDataProvider.class);
+        when(appEngine.getMetaData()).thenReturn("App meta data");
         @SuppressWarnings("unchecked")
-        var argParser = new DefaultArgParser<MockArgs>(appEngine, metaProvider);
-        when(metaProvider.getMetaData()).thenReturn("App 1.0.0");
-        assertEquals("App 1.0.0", argParser.getVersion());
+        var argParser = new DefaultArgParser<MockArgs>(appEngine);
+        assertEquals("App meta data", argParser.getMetaData());
     }
 
 }

@@ -6,22 +6,12 @@ public class DefaultArgParser<T> implements ArgParser<T> {
 
     private final AppEngine<T> app;
 
-    private final AppMetaDataProvider metaProvider;
-
     public DefaultArgParser(T args) {
         this(new DefaultAppEngine<>(args));
     }
 
     public DefaultArgParser(AppEngine<T> appEngine) {
-        this(appEngine, new StandardAppMetaDataProvider());
-    }
-
-    public DefaultArgParser(
-        AppEngine<T> appEngine, 
-        AppMetaDataProvider metaProvider
-    ) {
         this.app = appEngine;
-        this.metaProvider = metaProvider;
     }
 
     @Override
@@ -30,13 +20,13 @@ public class DefaultArgParser<T> implements ArgParser<T> {
     }
 
     @Override
-    public T parse(String[] args) throws ParameterException {
-        return app.parseArgs(args);
+    public String getMetaData() {
+        return app.getMetaData();
     }
 
     @Override
-    public String getVersion() {
-        return metaProvider.getMetaData();
+    public T parse(String[] args) throws ParameterException {
+        return app.parseArgs(args);
     }
 
 }

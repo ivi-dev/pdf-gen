@@ -11,9 +11,16 @@ class DefaultAppEngine<T> implements AppEngine<T> {
 
     private final T args;
 
+    private final AppMetaDataProvider metaProvider;
+
     DefaultAppEngine(T args) {
+        this(args, new StandardAppMetaDataProvider());
+    }
+
+    DefaultAppEngine(T args, AppMetaDataProvider metaProvider) {
         this.args = args;
-        app  = JCommander.newBuilder().addObject(this.args).build();
+        this.metaProvider = metaProvider;
+        app = JCommander.newBuilder().addObject(this.args).build();
     }
 
     private static String[] normalizeArgs(String[] args) {
@@ -36,6 +43,11 @@ class DefaultAppEngine<T> implements AppEngine<T> {
         var sb = new StringBuilder();
         app.usage(sb);
         return sb.toString();
+    }
+
+    @Override
+    public String getMetaData() {
+        return metaProvider.getMetaData();
     }
 
     @Override

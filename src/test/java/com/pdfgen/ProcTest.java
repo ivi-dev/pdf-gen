@@ -106,7 +106,7 @@ class ProcTest {
     void setUp() {
         argParser = mock(DefaultArgParser.class);
         when(argParser.getUsage()).thenReturn(usageInfo);
-        when(argParser.getVersion()).thenReturn(versionInfo);
+        when(argParser.getMetaData()).thenReturn(versionInfo);
         parsedArgs = mock(Args.class);
         when(argParser.parse(args)).thenReturn(parsedArgs);
         pdfGenerator = mock(PDFGenerator.class);
