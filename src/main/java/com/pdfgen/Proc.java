@@ -113,11 +113,24 @@ class Proc {
         setVerbose(false);
     }
 
+    private void printVersion() {
+        setVerbose(true);
+        reporters.info(
+            "minimal", 
+            argParser.getMetaData()
+        );
+        setVerbose(false);
+    }
+
      void run() {
         try {
             parsedArgs = argParser.parse(args);
             if (parsedArgs.getHelp()) {
                 printUsage();
+                return;
+            }
+            if (parsedArgs.getVersion()) {
+                printVersion();
                 return;
             }
             verbose = parsedArgs.getVerbose();

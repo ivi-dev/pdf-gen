@@ -6,6 +6,8 @@ interface AppEngine<T> {
 
     String getUsage();
 
+    String getMetaData();
+
     T parseArgs(String[] args) throws ParameterException;
     
 }

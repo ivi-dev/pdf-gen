@@ -10,6 +10,10 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
+    <organization>
+        <name>Iliyan Videv</name>
+    </organization>
+
     <properties>
         <junit.jupiter.version>6.0.1</junit.jupiter.version>
         <mockito.version>5.21.0</mockito.version>
@@ -122,6 +126,22 @@
                 </executions>
             </plugin>
 
+            <!-- Track the program's version in a manifest file -->
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-jar-plugin</artifactId> 
+                <version>3.3.0</version>
+                <configuration> 
+                    <archive> 
+                        <manifestEntries> 
+                            <Implementation-Title>${project.artifactId}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version> 
+                            <Implementation-Vendor>${organization.name}</Implementation-Vendor> 
+                        </manifestEntries> 
+                    </archive> 
+                </configuration> 
+            </plugin>
+
             <!-- Ensures the JAR has a manifest with the entry point -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -192,9 +212,10 @@
                     <excludes>
                         <exclude>com/pdfgen/App*</exclude>
                         <exclude>com/pdfgen/StandartOutReporter*</exclude>
-                        <exclude>com/pdfgen/cli/DefaultAppEngine*</exclude>
                         <exclude>com/pdfgen/DefaultStreams*</exclude>
                         <exclude>com/pdfgen/DefaultDataParser*</exclude>
+                        <exclude>com/pdfgen/cli/DefaultAppEngine*</exclude>
+                        <exclude>com/pdfgen/cli/StandardAppMetaDataProvider*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

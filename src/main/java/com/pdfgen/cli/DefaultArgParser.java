@@ -6,21 +6,22 @@ public class DefaultArgParser<T> implements ArgParser<T> {
 
     private final AppEngine<T> app;
 
-    private final T args;
-
     public DefaultArgParser(T args) {
-        this.args = args;
-        this.app = new DefaultAppEngine<>(this.args);
+        this(new DefaultAppEngine<>(args));
     }
 
-    public DefaultArgParser(T args, AppEngine<T> appEngine) {
-        this.args = args;
+    public DefaultArgParser(AppEngine<T> appEngine) {
         this.app = appEngine;
     }
 
     @Override
     public String getUsage() {
         return app.getUsage();
+    }
+
+    @Override
+    public String getMetaData() {
+        return app.getMetaData();
     }
 
     @Override
