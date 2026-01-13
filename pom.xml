@@ -122,6 +122,21 @@
                 </executions>
             </plugin>
 
+            <!-- Track the program's version in a manifest file -->
+            <plugin> 
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-jar-plugin</artifactId> 
+                <version>3.3.0</version>
+                <configuration> 
+                    <archive> 
+                        <manifestEntries> 
+                            <Implementation-Title>${project.artifactId}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version> 
+                        </manifestEntries> 
+                    </archive> 
+                </configuration> 
+            </plugin>
+
             <!-- Ensures the JAR has a manifest with the entry point -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
