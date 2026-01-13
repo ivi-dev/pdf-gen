@@ -3,6 +3,7 @@ package com.pdfgen.cli;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,12 +40,21 @@ public class DefaultArgParserTest {
 
     @Test
     void getUsageReturnsAppUsageInfo() {
-        var args = new MockArgs();
         var appEngine = mock(AppEngine.class);
         @SuppressWarnings("unchecked")
-        var argParser = new DefaultArgParser<MockArgs>(args, appEngine);
+        var argParser = new DefaultArgParser<MockArgs>(appEngine);
         argParser.getUsage();
         verify(appEngine).getUsage();
+    }
+
+    @Test
+    void getVersionReturnsVersionInfo() {
+        var appEngine = mock(AppEngine.class);
+        var metaProvider = mock(AppMetaDataProvider.class);
+        @SuppressWarnings("unchecked")
+        var argParser = new DefaultArgParser<MockArgs>(appEngine, metaProvider);
+        when(metaProvider.getMetaData()).thenReturn("App 1.0.0");
+        assertEquals("App 1.0.0", argParser.getVersion());
     }
 
 }

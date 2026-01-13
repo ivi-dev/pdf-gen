@@ -31,6 +31,8 @@ class ProcTest {
 
     private static final String usageInfo = "Program usage info.";
 
+    private static final String versionInfo = "Program version info.";
+
     private Args parsedArgs;
     
     private PDFGenerator pdfGenerator;
@@ -104,6 +106,7 @@ class ProcTest {
     void setUp() {
         argParser = mock(DefaultArgParser.class);
         when(argParser.getUsage()).thenReturn(usageInfo);
+        when(argParser.getVersion()).thenReturn(versionInfo);
         parsedArgs = mock(Args.class);
         when(argParser.parse(args)).thenReturn(parsedArgs);
         pdfGenerator = mock(PDFGenerator.class);
@@ -181,6 +184,17 @@ class ProcTest {
             var inOrder = inOrder(reporters);
             assertSetVerbose(reporters, inOrder, true);
             inOrder.verify(reporters).info("minimal", usageInfo);
+            assertSetVerbose(reporters, inOrder, false);
+        });
+    }
+
+    @Test
+    void runPrintsVersionInfo() throws Exception {
+        when(parsedArgs.getVersion()).thenReturn(true);
+        runProc(false, () -> { 
+            var inOrder = inOrder(reporters);
+            assertSetVerbose(reporters, inOrder, true);
+            inOrder.verify(reporters).info("minimal", versionInfo);
             assertSetVerbose(reporters, inOrder, false);
         });
     }

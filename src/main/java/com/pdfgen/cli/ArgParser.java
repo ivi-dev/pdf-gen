@@ -6,6 +6,8 @@ public interface ArgParser<T> {
 
     String getUsage();
 
+    String getVersion();
+
     T parse(String[] args) throws ParameterException;
     
 }
