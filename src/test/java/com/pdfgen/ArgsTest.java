@@ -45,6 +45,7 @@ public class ArgsTest {
             new Locale("bg"),
             fonts,
             true,
+            false,
             false
         );
     } 
@@ -64,6 +65,7 @@ public class ArgsTest {
                 null,
                 fonts,
                 true,
+                false,
                 false,
                 (args) -> mock(ClassFieldsInspector.class)
             )
@@ -111,6 +113,11 @@ public class ArgsTest {
     }
 
     @Test
+    void getVersionReturnsCorrectValue() {
+        assertEquals(false, parsedArgs.getVersion());
+    }
+
+    @Test
     void toStringRepresentsNonNullArgumentsWithParameterlessConstructor() {
         var args = new Args();
         assertEquals(
@@ -129,6 +136,7 @@ public class ArgsTest {
             null,
             fonts,
             true,
+            false,
             false
         );
         assertEquals(

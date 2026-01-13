@@ -67,6 +67,13 @@ class Args {
     )
     private boolean help = false;
 
+    @Parameter(
+        names = {"--version", "-v"}, 
+        descriptionKey = "argVersion",
+        order = 6
+    )
+    private boolean version = false;
+
     private static final Function<Args, ClassFieldsInspector> DEFAULT_FIELD_INSPECTOR_SUPPLIER =
         (args) -> new StandardClassFieldsInspector(args, Parameter.class);
 
@@ -81,7 +88,8 @@ class Args {
         Locale locale, 
         List<FontDeclaration> font,
         boolean verbose,
-        boolean help
+        boolean help,
+        boolean version
     ) {
         this(
             template,
@@ -91,6 +99,7 @@ class Args {
             font,
             verbose,
             help,
+            version,
             DEFAULT_FIELD_INSPECTOR_SUPPLIER
         );
     }
@@ -103,6 +112,7 @@ class Args {
         List<FontDeclaration> font,
         boolean verbose,
         boolean help,
+        boolean version,
         Function<Args, ClassFieldsInspector> fieldInspectorSupplier
     ) {
         this.template = template;
@@ -141,6 +151,10 @@ class Args {
 
     boolean getHelp() {
         return help;
+    }
+
+    boolean getVersion() {
+        return version;
     }
 
     @Override
