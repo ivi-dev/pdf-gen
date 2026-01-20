@@ -12,25 +12,10 @@ class StandardAppMetaDataProvider implements AppMetaDataProvider {
     public String getMetaData() {
         return String.format(
             "%s %s by %s", 
-            getTitle(), 
-            getVersion(), 
-            getMeintainer()
+            pkg.getImplementationTitle(), 
+            pkg.getImplementationVersion(), 
+            pkg.getImplementationVendor()
         );
-    }
-
-    @Override
-    public String getTitle() {
-        return pkg.getImplementationTitle();
-    }
-
-    @Override
-    public String getVersion() {
-        return pkg.getImplementationVersion();
-    }
-
-    @Override
-    public String getMeintainer() {
-        return pkg.getImplementationVendor();
     }
 
 }
