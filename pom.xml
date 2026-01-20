@@ -4,6 +4,8 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <name>PDF Generator</name>
+
     <!-- Change these to match your project -->
     <groupId>com.pdfgen</groupId>
     <artifactId>pdfgen</artifactId>
@@ -134,7 +136,7 @@
                 <configuration> 
                     <archive> 
                         <manifestEntries> 
-                            <Implementation-Title>${project.artifactId}</Implementation-Title>
+                            <Implementation-Title>${project.name}</Implementation-Title>
                             <Implementation-Version>${project.version}</Implementation-Version> 
                             <Implementation-Vendor>${organization.name}</Implementation-Vendor> 
                         </manifestEntries> 
