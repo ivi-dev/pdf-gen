@@ -1,6 +1,7 @@
 package com.pdfgen.cli;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -37,9 +38,20 @@ class DefaultAppEngine<T> implements AppEngine<T> {
         return normalized.toArray(new String[0]);
     }
 
+    private void setUsageFormatter() {
+        app.setUsageFormatter(
+            new LocalizedUsageFormatter(
+                app, ResourceBundle.getBundle(
+                    "i18n.Messages"
+                )
+            )
+        );
+    }
+
     @Override
-    public String getUsage(){
-        app.setProgramName("pdfgen");
+    public String getUsage() {
+        app.setProgramName("pdfgen"); // TODO: Get this from META-INF
+        setUsageFormatter();
         var sb = new StringBuilder();
         app.usage(sb);
         return sb.toString();
