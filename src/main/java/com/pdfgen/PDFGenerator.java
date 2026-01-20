@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Locale;
 
 import com.pdfgen.converters.FontDeclaration;
+import com.pdfgen.reporting.ConditionalBasicReporter;
 import com.pdfgen.reporting.ConditionalReporter;
-import com.pdfgen.reporting.StandardConditionalTimestampedI18NReporter;
 
 class PDFGenerator {
 
@@ -67,11 +67,7 @@ class PDFGenerator {
                 fonts
             ),
             new DefaultFileSystem(),
-            new StandardConditionalTimestampedI18NReporter(
-                new StandardResourceBundleWrapper(
-                    "i18n.Messages"
-                )
-            )
+            ConditionalBasicReporter.leveledTimestampedI18N()
         );
     }
 

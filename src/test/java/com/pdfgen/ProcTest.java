@@ -61,21 +61,36 @@ class ProcTest {
         InOrder inOrder, 
         boolean verbose
     ) {
-        var procCaptor = ArgumentCaptor.forClass(Consumer.class);
-        if (inOrder != null)
+        var captor1 = ArgumentCaptor.forClass(Consumer.class);
+        var captor2 = ArgumentCaptor.forClass(Consumer.class);
+        if (inOrder != null) {
             inOrder.verify(reporters).invoke(
-                eq("conditionalTimestampedI18N"), 
-                procCaptor.capture()
+                eq("conditionalTimestampedPrefixedI18N"), 
+                captor1.capture()
             );
-        else
+            inOrder.verify(reporters).invoke(
+                eq("conditionalPrefixedI18N"), 
+                captor2.capture()
+            );
+        }
+        else {
             verify(reporters).invoke(
-                eq("conditionalTimestampedI18N"), 
-                procCaptor.capture()
+                eq("conditionalTimestampedPrefixedI18N"), 
+                captor1.capture()
             );
-        var mockReporter = mock(ConditionalReporter.class);
-        var proc = procCaptor.getValue();
-        proc.accept(mockReporter);
-        verify((ConditionalReporter)mockReporter).setVerbose(verbose);
+            verify(reporters).invoke(
+                eq("conditionalPrefixedI18N"), 
+                captor2.capture()
+            );
+        }
+        var mockReporter1 = mock(ConditionalReporter.class);
+        var proc1 = captor1.getValue();
+        proc1.accept(mockReporter1);
+        verify((ConditionalReporter)mockReporter1).setVerbose(verbose);
+        var mockReporter2 = mock(ConditionalReporter.class);
+        var proc2 = captor2.getValue();
+        proc2.accept(mockReporter2);
+        verify((ConditionalReporter)mockReporter2).setVerbose(verbose);
     }
 
     private void assertPdfGeneratorCalled(InOrder inOrder, boolean verbose) {
@@ -90,13 +105,13 @@ class ProcTest {
         var inOrder = inOrder(reporters, pdfGenerator);
         assertSetVerbose(reporters, inOrder, verbose);
         inOrder.verify(reporters).info(
-            "conditionalTimestampedI18N", 
+            "conditionalTimestampedPrefixedI18N", 
             "finishedParsingArgs", 
             parsedArgs
         );
         assertPdfGeneratorCalled(inOrder, verbose);
         inOrder.verify(reporters).success(
-            "conditionalTimestampedI18N",
+            "conditionalTimestampedPrefixedI18N",
             "documentGenerationSuccess"
         );
     }
@@ -225,7 +240,7 @@ class ProcTest {
             var inOrder = inOrder(reporters, pdfGenerator);
             assertSetVerbose(reporters, inOrder, true);
             inOrder.verify(reporters).error(
-                "conditionalTimestampedI18N",
+                "conditionalPrefixedI18N",
                 "invalidCommandLineArgument", 
                 usageInfo
             );

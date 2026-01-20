@@ -16,7 +16,7 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 import com.pdfgen.converters.FontDeclaration;
 import com.pdfgen.reporting.ConditionalReporter;
-import com.pdfgen.reporting.StandardConditionalTimestampedI18NReporter;
+import com.pdfgen.reporting.ConditionalBasicReporter;
 
 class DefaultDocumentBuilder implements DocumentBuilder {
 
@@ -56,11 +56,7 @@ class DefaultDocumentBuilder implements DocumentBuilder {
             new PdfRendererBuilder(),
             new DefaultDataParser(),
             new DefaultDataPopulator(locale),
-            new StandardConditionalTimestampedI18NReporter(
-                new StandardResourceBundleWrapper(
-                    "i18n.Messages"
-                )
-            )
+            ConditionalBasicReporter.leveledTimestampedI18N()
         );
     }
 

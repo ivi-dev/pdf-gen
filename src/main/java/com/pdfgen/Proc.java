@@ -8,10 +8,10 @@ import com.beust.jcommander.ParameterException;
 import com.openhtmltopdf.util.XRLog;
 import com.pdfgen.cli.ArgParser;
 import com.pdfgen.cli.DefaultArgParser;
+import com.pdfgen.reporting.BasicReporter;
+import com.pdfgen.reporting.ConditionalBasicReporter;
 import com.pdfgen.reporting.ConditionalReporter;
-import com.pdfgen.reporting.MinimalReporter;
 import com.pdfgen.reporting.Reporters;
-import com.pdfgen.reporting.StandardConditionalTimestampedI18NReporter;
 
 class Proc {
 
@@ -32,30 +32,32 @@ class Proc {
         pdfGeneratorProvider.apply(parsedArgs).generate(verbose);
     };
 
+    private static final Function<Args, PDFGenerator> defaultPDFGeneratorProvider = 
+        (parsedArgs) -> new PDFGenerator(
+            parsedArgs.getTemplate(), 
+            parsedArgs.getData(),
+            parsedArgs.getOutput(), 
+            parsedArgs.getLocale(),
+            parsedArgs.getFont()
+        );
+
+    private static final Reporters defaultReporters = new Reporters(
+        Map.of(
+            "conditionalTimestampedPrefixedI18N",
+            ConditionalBasicReporter.leveledTimestampedI18N(),
+            "conditionalPrefixedI18N",
+            ConditionalBasicReporter.leveledI18N(),
+            "minimal",
+            new BasicReporter()
+        )
+    );
+
     Proc(String[] args) { 
         this(
             args,
             new DefaultArgParser<>(new Args()), 
-            (parsedArgs) -> 
-                new PDFGenerator(
-                    parsedArgs.getTemplate(), 
-                    parsedArgs.getData(),
-                    parsedArgs.getOutput(), 
-                    parsedArgs.getLocale(),
-                    parsedArgs.getFont()
-                ),
-            new Reporters(
-                Map.of(
-                    "conditionalTimestampedI18N",
-                    new StandardConditionalTimestampedI18NReporter(
-                        new StandardResourceBundleWrapper(
-                            "i18n.Messages"
-                        )
-                    ),
-                    "minimal",
-                    new MinimalReporter()
-                )
-            )
+            defaultPDFGeneratorProvider,
+            defaultReporters
         );
     }
 
@@ -97,7 +99,13 @@ class Proc {
 
     private void setVerbose(boolean verbose) {
         reporters.invoke(
-            "conditionalTimestampedI18N", 
+            "conditionalTimestampedPrefixedI18N", 
+            (reporter) -> (
+                (ConditionalReporter) reporter
+            ).setVerbose(verbose)
+        );
+        reporters.invoke(
+            "conditionalPrefixedI18N", 
             (reporter) -> (
                 (ConditionalReporter) reporter
             ).setVerbose(verbose)
@@ -136,13 +144,13 @@ class Proc {
             verbose = parsedArgs.getVerbose();
             setVerbose(verbose);
             reporters.info(
-                "conditionalTimestampedI18N", 
+                "conditionalTimestampedPrefixedI18N", 
                 "finishedParsingArgs", 
                 parsedArgs
             );
             pdfGeneratorProc.run();
             reporters.success(
-                "conditionalTimestampedI18N",
+                "conditionalTimestampedPrefixedI18N",
                 "documentGenerationSuccess"
             );
         } catch (Exception e) {
@@ -154,7 +162,7 @@ class Proc {
         if (e instanceof ParameterException) {
             setVerbose(true);
             reporters.error(
-                "conditionalTimestampedI18N",
+                "conditionalPrefixedI18N",
                 "invalidCommandLineArgument", 
                 argParser.getUsage()
             );
