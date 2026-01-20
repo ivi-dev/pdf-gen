@@ -4,11 +4,11 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-class StandardResourceBundleWrapper implements ResourceBundleWrapper {
+public class StandardResourceBundleWrapper implements ResourceBundleWrapper {
 
     private final ResourceBundle bundle;
 
-    StandardResourceBundleWrapper(String baseName) {
+    public StandardResourceBundleWrapper(String baseName) {
         this.bundle = ResourceBundle.getBundle(baseName);
     }
 
