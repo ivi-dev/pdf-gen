@@ -17,6 +17,7 @@
     </organization>
 
     <properties>
+        <programShortName>pdfgen</programShortName>
         <junit.jupiter.version>6.0.1</junit.jupiter.version>
         <mockito.version>5.21.0</mockito.version>
         <maven.compiler.source>17</maven.compiler.source>
@@ -136,9 +137,10 @@
                 <configuration> 
                     <archive> 
                         <manifestEntries> 
+                            <Implementation-Short-Name>${programShortName}</Implementation-Short-Name>
                             <Implementation-Title>${project.name}</Implementation-Title>
                             <Implementation-Version>${project.version}</Implementation-Version> 
-                            <Implementation-Vendor>${organization.name}</Implementation-Vendor> 
+                            <Implementation-Vendor>${organization.name}</Implementation-Vendor>
                         </manifestEntries> 
                     </archive> 
                 </configuration> 
@@ -213,11 +215,9 @@
                 <configuration>
                     <excludes>
                         <exclude>com/pdfgen/App*</exclude>
-                        <exclude>com/pdfgen/StandartOutReporter*</exclude>
                         <exclude>com/pdfgen/DefaultStreams*</exclude>
                         <exclude>com/pdfgen/DefaultDataParser*</exclude>
-                        <exclude>com/pdfgen/cli/DefaultAppEngine*</exclude>
-                        <exclude>com/pdfgen/cli/StandardAppMetaDataProvider*</exclude>
+                        <exclude>com/pdfgen/cli/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
