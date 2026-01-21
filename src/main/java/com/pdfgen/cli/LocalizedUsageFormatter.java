@@ -30,7 +30,7 @@ public class LocalizedUsageFormatter extends DefaultUsageFormatter {
         int indentCount, 
         String indent
     ) {
-        out.append(bundle.getString("usageHeader") + " ")
+        out.append(getI18nString(bundle, "usageHeader", "-") + " ")
            .append(commander.getProgramName() + " ")
            .append(getI18nString(bundle, "usageSynopsisOptions", "-"))
            .append("\n\n")
@@ -54,7 +54,7 @@ public class LocalizedUsageFormatter extends DefaultUsageFormatter {
             out.append("\n");
             var def = param.getDefault();
             if (def != null) {
-                out.append(s(indentSize) + bundle.getString("usageDefault") + " ");
+                out.append(s(indentSize) + getI18nString(bundle, "usageDefault", "-") + " ");
                 out.append(def.toString() + "\n");
             }
             indentSize -= 4;
