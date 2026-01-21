@@ -5,19 +5,8 @@ import com.pdfgen.StandardResourceBundleWrapper;
 
 public class I18NMessageModifier implements MessageModifier {
 
-    private final ResourceBundleWrapper resBundleWrap;
-
-    public I18NMessageModifier() {
-        this(
-            new StandardResourceBundleWrapper(
-                "i18n.Messages"
-            )
-        );
-    }
-
-    public I18NMessageModifier(ResourceBundleWrapper resBundleWrap) {
-        this.resBundleWrap = resBundleWrap;
-    }
+    private final ResourceBundleWrapper resBundleWrap = 
+        new StandardResourceBundleWrapper("i18n.Messages");
 
     @Override
     public String modify(String msg, Object ...args) {

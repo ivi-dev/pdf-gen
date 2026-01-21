@@ -2,7 +2,6 @@ package com.pdfgen.reporting;
 
 import java.util.function.Supplier;
 
-import com.pdfgen.StandardResourceBundleWrapper;
 import com.pdfgen.reporting.modifiers.I18NMessageModifier;
 import com.pdfgen.reporting.modifiers.MessageModifier;
 import com.pdfgen.reporting.prefixers.I18NLevelPrefixer;
@@ -14,13 +13,7 @@ public class ConditionalBasicReporter
     implements ConditionalReporter {
 
     private static final Supplier<MessageModifier[]> DEFAULT_MESSAGE_MODIFIERS = 
-        () -> new MessageModifier[] {
-            new I18NMessageModifier(
-                new StandardResourceBundleWrapper(
-                    "i18n.Messages"
-                )
-            )
-        };
+        () -> new MessageModifier[] { new I18NMessageModifier() };
 
     private boolean verbose;
 
