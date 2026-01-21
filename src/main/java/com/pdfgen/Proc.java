@@ -32,32 +32,27 @@ class Proc {
         pdfGeneratorProvider.apply(parsedArgs).generate(verbose);
     };
 
-    private static final Function<Args, PDFGenerator> defaultPDFGeneratorProvider = 
-        (parsedArgs) -> new PDFGenerator(
-            parsedArgs.getTemplate(), 
-            parsedArgs.getData(),
-            parsedArgs.getOutput(), 
-            parsedArgs.getLocale(),
-            parsedArgs.getFont()
-        );
-
-    private static final Reporters defaultReporters = new Reporters(
-        Map.of(
-            "conditionalTimestampedPrefixedI18N",
-            ConditionalBasicReporter.leveledTimestampedI18N(),
-            "conditionalPrefixedI18N",
-            ConditionalBasicReporter.leveledI18N(),
-            "minimal",
-            new BasicReporter()
-        )
-    );
-
     Proc(String[] args) { 
         this(
             args,
             new DefaultArgParser<>(new Args()), 
-            defaultPDFGeneratorProvider,
-            defaultReporters
+            (parsedArgs) -> new PDFGenerator(
+                parsedArgs.getTemplate(), 
+                parsedArgs.getData(),
+                parsedArgs.getOutput(), 
+                parsedArgs.getLocale(),
+                parsedArgs.getFont()
+            ),
+            new Reporters(
+                Map.of(
+                    "conditionalTimestampedPrefixedI18N",
+                    ConditionalBasicReporter.leveledTimestampedI18N(),
+                    "conditionalPrefixedI18N",
+                    ConditionalBasicReporter.leveledI18N(),
+                    "minimal",
+                    new BasicReporter()
+                )
+            )
         );
     }
 
